@@ -1,26 +1,243 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* DonBot Red Theme - Based on Food Delivery Design */
+  --radius: 1rem; /* 16px - matching design's rounded corners */
+
+  /* Primary Red (Main brand color from design) */
+  --primary: 0 84% 60%; /* HSL for #D32F2F - Bold Red */
+  --primary-foreground: 0 0% 100%; /* White text on red */
+
+  /* Background */
+  --background: 0 0% 98%; /* Off-white #FAFAFA */
+  --foreground: 0 0% 13%; /* Dark gray #212121 */
+
+  /* Card */
+  --card: 0 0% 100%; /* Pure white */
+  --card-foreground: 0 0% 13%;
+
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 13%;
+
+  /* Secondary */
+  --secondary: 0 0% 96%; /* Light gray #F5F5F5 */
+  --secondary-foreground: 0 0% 13%;
+
+  /* Muted */
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 62%; /* Gray text #9E9E9E */
+
+  /* Accent (Gold for badges/highlights) */
+  --accent: 45 100% 50%; /* #FFB300 - Gold */
+  --accent-foreground: 0 0% 100%;
+
+  /* Destructive/Error */
+  --destructive: 4 90% 58%; /* #F44336 - Error red */
+  --destructive-foreground: 0 0% 100%; /* White text on destructive */
+
+  /* Border */
+  --border: 0 0% 88%; /* #E0E0E0 */
+  --input: 0 0% 88%;
+  --ring: 0 84% 60%; /* Same as primary */
+
+  /* Success (for "OPEN" badges) */
+  --success: 122 39% 49%; /* #4CAF50 - Green */
+
+  /* Warning */
+  --warning: 36 100% 50%; /* #FF9800 - Orange */
+
+  /* Chart colors */
+  --chart-1: 0 84% 60%; /* Red */
+  --chart-2: 122 39% 49%; /* Green */
+  --chart-3: 207 90% 54%; /* Blue */
+  --chart-4: 45 100% 50%; /* Gold */
+  --chart-5: 280 61% 50%; /* Purple */
+
+  /* Sidebar (not used in mobile-first design) */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 0 0% 13%;
+  --sidebar-primary: 0 84% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 96%;
+  --sidebar-accent-foreground: 0 0% 13%;
+  --sidebar-border: 0 0% 88%;
+  --sidebar-ring: 0 84% 60%;
+}
+
+.dark {
+  --background: 0 0% 13%; /* #212121 - Dark background */
+  --foreground: 0 0% 98%; /* Off-white text */
+
+  --card: 0 0% 18%; /* #2D2D2D - Slightly lighter than bg */
+  --card-foreground: 0 0% 98%;
+
+  --popover: 0 0% 18%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 0 84% 65%; /* Slightly lighter red for dark mode */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 25%; /* #404040 */
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 0 0% 25%;
+  --muted-foreground: 0 0% 65%; /* Lighter muted text */
+
+  --accent: 45 100% 55%; /* Slightly lighter gold */
+  --accent-foreground: 0 0% 13%;
+
+  --destructive: 4 90% 65%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 25%;
+  --input: 0 0% 25%;
+  --ring: 0 84% 65%;
+
+  --chart-1: 0 84% 65%;
+  --chart-2: 122 39% 60%;
+  --chart-3: 207 90% 65%;
+  --chart-4: 45 100% 60%;
+  --chart-5: 280 61% 60%;
+
+  --sidebar: 0 0% 18%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-primary: 0 84% 65%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 25%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-border: 0 0% 25%;
+  --sidebar-ring: 0 84% 65%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Custom font imports - matching food delivery design */
+  @font-face {
+    font-family: 'Lobster';
+    src: url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Price badge component (red circle in top-right) */
+  .price-badge {
+    @apply absolute top-2 right-2 bg-primary text-primary-foreground text-sm font-bold px-3 py-1.5 rounded-full shadow-lg;
+  }
+
+  /* Restaurant card styling */
+  .restaurant-card {
+    @apply bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow;
+  }
+
+  /* Popular badge */
+  .popular-badge {
+    @apply bg-accent text-accent-foreground text-xs font-semibold px-2 py-1 rounded-md inline-flex items-center gap-1;
+  }
+
+  /* Status badge (Open/Closed) */
+  .status-badge-open {
+    @apply bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded;
+  }
+
+  .status-badge-closed {
+    @apply bg-destructive text-white text-xs font-semibold px-2 py-1 rounded;
+  }
+
+  /* Category tab styling */
+  .category-tab {
+    @apply px-5 py-2 rounded-full text-sm font-medium transition-all;
+  }
+
+  .category-tab-active {
+    @apply bg-primary text-primary-foreground shadow-md;
+  }
+
+  .category-tab-inactive {
+    @apply bg-transparent text-muted-foreground hover:text-foreground;
+  }
+
+  /* Bottom navigation */
+  .bottom-nav-item {
+    @apply w-12 h-12 rounded-full flex items-center justify-center transition-all;
+  }
+
+  .bottom-nav-item-active {
+    @apply bg-primary text-primary-foreground shadow-lg scale-110;
+  }
+
+  .bottom-nav-item-inactive {
+    @apply bg-card border-2 border-border text-muted-foreground hover:text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Smooth scrolling for tabs */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

@@ -1,65 +1,174 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { HeroBanner } from '@/components/layout/HeroBanner';
+import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
+import { restaurantsApi, type Restaurant } from '@/lib/api';
+
+// Mock data for development - will be replaced with real API calls
+const mockRestaurants: Restaurant[] = [
+  {
+    id: '1',
+    name: 'Limon Grillhaus',
+    slug: 'limon-grillhaus',
+    logo_url: null,
+    banner_image_url: null,
+    cuisine_type: 'Turkish Grill',
+    rating: 4.7,
+    delivery_time: '20-30 min',
+    minimum_order: 15,
+    delivery_fee: 2.5,
+    is_open: true,
+    distance: 0.8,
+  },
+  {
+    id: '2',
+    name: 'Pizza Italiana',
+    slug: 'pizza-italiana',
+    logo_url: null,
+    banner_image_url: null,
+    cuisine_type: 'Italian Pizza',
+    rating: 4.5,
+    delivery_time: '25-35 min',
+    minimum_order: 12,
+    delivery_fee: 1.5,
+    is_open: true,
+    distance: 1.2,
+  },
+  {
+    id: '3',
+    name: 'Sushi Garden',
+    slug: 'sushi-garden',
+    logo_url: null,
+    banner_image_url: null,
+    cuisine_type: 'Japanese Sushi',
+    rating: 4.8,
+    delivery_time: '30-40 min',
+    minimum_order: 20,
+    delivery_fee: 3.0,
+    is_open: false,
+    distance: 2.1,
+  },
+  {
+    id: '4',
+    name: 'Burger Palace',
+    slug: 'burger-palace',
+    logo_url: null,
+    banner_image_url: null,
+    cuisine_type: 'American Burgers',
+    rating: 4.3,
+    delivery_time: '15-25 min',
+    minimum_order: 10,
+    delivery_fee: 0,
+    is_open: true,
+    distance: 0.5,
+  },
+];
 
 export default function Home() {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRestaurants = async () => {
+      try {
+        // Placeholder coordinates until geolocation/back end nearby endpoint is ready
+        const data = await restaurantsApi.getNearbyRestaurants(51.0504, 13.7373, 5);
+
+        if (!isMounted) return;
+
+        if (data && data.length > 0) {
+          setRestaurants(data);
+        } else {
+          setRestaurants(mockRestaurants);
+        }
+      } catch (err) {
+        console.error('Failed to load restaurants, falling back to mock data.', err);
+        if (!isMounted) return;
+        setError('Using mock restaurants until the API is available.');
+        setRestaurants(mockRestaurants);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen">
+      {/* Hero Banner */}
+      <HeroBanner />
+
+      {/* Category Tabs */}
+      <div className="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
+        <div className="container mx-auto">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+            <button className="px-6 py-2.5 rounded-full text-sm font-semibold bg-[#D32F2F] text-white shadow-md whitespace-nowrap">
+              Nearby
+            </button>
+            <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
+              Top Rated
+            </button>
+            <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
+              Fast Delivery
+            </button>
+            <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
+              Free Delivery
+            </button>
+            <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
+              Popular
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      {/* Restaurant Grid */}
+      <section className="container mx-auto px-4 py-6 pb-32">
+        {error && (
+          <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+            {error}
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-48 rounded-2xl bg-gray-100 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {restaurants.map((restaurant) => (
+                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              ))}
+            </div>
+
+            {/* Empty State (shown when no restaurants) */}
+            {restaurants.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-xl text-muted-foreground mb-2">
+                  No restaurants found
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your location or filters
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }
