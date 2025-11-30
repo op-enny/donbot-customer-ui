@@ -5,14 +5,32 @@ import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 
+interface Modifier {
+  id: string;
+  name: string;
+  price_modifier: number;
+  is_available: boolean;
+}
+
+interface ModifierGroup {
+  id: string;
+  name: string;
+  selection_type: 'single' | 'multiple';
+  required: boolean;
+  min_selections?: number;
+  max_selections?: number;
+  modifiers: Modifier[];
+}
+
 interface ItemModalProps {
   item: {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     image_url: string | null;
     category: string;
+    modifier_groups?: ModifierGroup[];
   };
   restaurantId?: string;
   restaurantName?: string;
@@ -21,40 +39,7 @@ interface ItemModalProps {
   onClose: () => void;
 }
 
-// Mock modifiers - will be replaced with real data from API
-const mockModifiers = {
-  salad: {
-    name: 'Salad',
-    required: true,
-    type: 'single',
-    options: [
-      { id: '1', name: 'Alles', price: 0 },
-      { id: '2', name: 'Ohne Zwiebeln', price: 0 },
-      { id: '3', name: 'Nur Fleisch & Soße', price: 0 },
-    ],
-  },
-  sauce: {
-    name: 'Sauce',
-    required: true,
-    type: 'single',
-    options: [
-      { id: '4', name: 'Knoblauch', price: 0 },
-      { id: '5', name: 'Scharf', price: 0 },
-      { id: '6', name: 'Kräuter', price: 0 },
-      { id: '7', name: 'Gemischt', price: 0 },
-    ],
-  },
-  extras: {
-    name: 'Extras',
-    required: false,
-    type: 'multiple',
-    options: [
-      { id: '8', name: 'Extra Käse', price: 1.5 },
-      { id: '9', name: 'Extra Fleisch', price: 2.0 },
-      { id: '10', name: 'Pommes', price: 2.5 },
-    ],
-  },
-};
+
 
 export function ItemModal({
   item,
@@ -65,14 +50,11 @@ export function ItemModal({
   onClose,
 }: ItemModalProps) {
   const [quantity, setQuantity] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({
-    salad: [],
-    sauce: [],
-    extras: [],
-  });
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
   const [specialInstructions, setSpecialInstructions] = useState('');
 
   const addItem = useCartStore((state) => state.addItem);
+  const modifierGroups = item.modifier_groups || [];
 
   if (!isOpen) return null;
 
@@ -94,13 +76,13 @@ export function ItemModal({
   const calculateTotalPrice = () => {
     let total = item.price * quantity;
 
-    // Add extra prices
-    Object.entries(mockModifiers).forEach(([key, group]) => {
-      const selected = selectedOptions[key] || [];
-      selected.forEach((optionId) => {
-        const option = group.options.find((opt) => opt.id === optionId);
-        if (option && option.price > 0) {
-          total += option.price * quantity;
+    // Add modifier prices
+    modifierGroups.forEach((group) => {
+      const selected = selectedOptions[group.id] || [];
+      selected.forEach((modifierId) => {
+        const modifier = group.modifiers.find((mod) => mod.id === modifierId);
+        if (modifier && modifier.price_modifier > 0) {
+          total += modifier.price_modifier * quantity;
         }
       });
     });
@@ -130,10 +112,10 @@ export function ItemModal({
   };
 
   const isValid = () => {
-    // Check if all required options are selected
-    return Object.entries(mockModifiers).every(([key, group]) => {
+    // Check if all required modifier groups are selected
+    return modifierGroups.every((group) => {
       if (!group.required) return true;
-      const selected = selectedOptions[key] || [];
+      const selected = selectedOptions[group.id] || [];
       return selected.length > 0;
     });
   };
@@ -173,26 +155,26 @@ export function ItemModal({
 
         {/* Modifiers */}
         <div className="p-6 space-y-6">
-          {Object.entries(mockModifiers).map(([key, group]) => (
-            <div key={key}>
+          {modifierGroups.map((group) => (
+            <div key={group.id}>
               <div className="mb-3">
                 <h4 className="text-base font-semibold text-gray-900">
                   {group.name}
                   {group.required && <span className="text-[#D32F2F] ml-1">*</span>}
                 </h4>
                 <p className="text-sm text-gray-600">
-                  {group.type === 'single' ? 'Select one' : 'Select multiple'}
+                  {group.selection_type === 'single' ? 'Select one' : 'Select multiple'}
                 </p>
               </div>
 
               <div className="space-y-2">
-                {group.options.map((option) => {
-                  const isSelected = (selectedOptions[key] || []).includes(option.id);
+                {group.modifiers.map((modifier) => {
+                  const isSelected = (selectedOptions[group.id] || []).includes(modifier.id);
 
                   return (
                     <button
-                      key={option.id}
-                      onClick={() => handleOptionSelect(key, option.id, group.type)}
+                      key={modifier.id}
+                      onClick={() => handleOptionSelect(group.id, modifier.id, group.selection_type)}
                       className={`w-full px-4 py-3 rounded-xl border-2 text-left transition-all ${
                         isSelected
                           ? 'border-[#D32F2F] bg-red-50'
@@ -201,10 +183,10 @@ export function ItemModal({
                     >
                       <div className="flex items-center justify-between">
                         <span className={`font-medium ${isSelected ? 'text-[#D32F2F]' : 'text-gray-900'}`}>
-                          {option.name}
+                          {modifier.name}
                         </span>
-                        {option.price > 0 && (
-                          <span className="text-sm text-gray-600">+€{option.price.toFixed(2)}</span>
+                        {modifier.price_modifier > 0 && (
+                          <span className="text-sm text-gray-600">+€{modifier.price_modifier.toFixed(2)}</span>
                         )}
                       </div>
                     </button>

@@ -299,25 +299,27 @@ export default function RestaurantMenuPage() {
 
       {/* Menu Items by Category */}
       <div className="container mx-auto px-4 py-6">
-        {categories?.map((category) => (
-          <div key={category.name} id={category.name} className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {category.name}
-            </h2>
+        {categories
+          ?.filter((category) => !activeCategory || category.name === activeCategory)
+          .map((category) => (
+            <div key={category.name} id={category.name} className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {category.name}
+              </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {category.items?.map((item) => (
-                <MenuItem
-                  key={item.id}
-                  item={item}
-                  restaurantId={restaurant.id}
-                  restaurantName={restaurant.name}
-                  restaurantSlug={restaurant.slug}
-                />
-              ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {category.items?.map((item) => (
+                  <MenuItem
+                    key={item.id}
+                    item={item}
+                    restaurantId={restaurant.id}
+                    restaurantName={restaurant.name}
+                    restaurantSlug={restaurant.slug}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

@@ -9,11 +9,11 @@ interface MenuItemProps {
   item: {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     image_url: string | null;
     category: string;
-    is_active: boolean;
+    is_available: boolean;
     is_popular?: boolean;
   };
   restaurantId: string;
@@ -24,7 +24,7 @@ interface MenuItemProps {
 export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }: MenuItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (!item.is_active) return null;
+  if (!item.is_available) return null;
 
   return (
     <>
@@ -68,7 +68,7 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }:
           </h3>
 
           <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-            {item.description}
+            {item.description || 'Keine Beschreibung verfügbar'}
           </p>
 
           {/* Price */}
