@@ -14,6 +14,9 @@ apiClient.interceptors.request.use(
   (config) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('API Request:', config.method?.toUpperCase(), config.url);
+      if (config.data) {
+        console.log('Request Data:', JSON.stringify(config.data, null, 2));
+      }
     }
     return config;
   },
@@ -27,7 +30,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (process.env.NODE_ENV === 'development') {
-      console.error('API Error:', error.response?.status, error.response?.data);
+      console.error('API Error:', error.response?.status);
+      console.error('Error Details:', error.response?.data);
+      console.error('Request URL:', error.config?.url);
+      console.error('Request Data:', error.config?.data);
     }
     return Promise.reject(error);
   }

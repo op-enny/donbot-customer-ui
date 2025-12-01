@@ -1,16 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/lib/store/cartStore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 
 export default function CartPage() {
+  const [mounted, setMounted] = useState(false);
   const { items, restaurantName, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
 
   const totalPrice = getTotalPrice();
   const deliveryFee = 2.5; // TODO: Get from restaurant settings
   const grandTotal = totalPrice + deliveryFee;
+
+  // Wait for client-side hydration to avoid SSR mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Show loading state during hydration
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

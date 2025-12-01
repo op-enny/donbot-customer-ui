@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cartStore';
 import { ordersApi } from '@/lib/api';
@@ -9,6 +9,7 @@ import Link from 'next/link';
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { items, restaurantId, restaurantName, restaurantSlug, getTotalPrice, clearCart } = useCartStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,9 +32,32 @@ export default function CheckoutPage() {
   const deliveryFee = formData.deliveryMethod === 'delivery' ? 2.5 : 0;
   const grandTotal = totalPrice + deliveryFee;
 
-  // Redirect if cart is empty
+  // Wait for client-side hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Redirect if cart is empty (only after mount)
+  useEffect(() => {
+    if (mounted && items.length === 0) {
+      router.push('/cart');
+    }
+  }, [mounted, items.length, router]);
+
+  // Show loading during hydration
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Return null while redirecting
   if (items.length === 0) {
-    router.push('/cart');
     return null;
   }
 
@@ -62,6 +86,24 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters except +
+    let cleaned = phone.replace(/[^\d+]/g, '');
+
+    // If starts with +49, format as +49 XXX XXXXXXX
+    if (cleaned.startsWith('+49')) {
+      cleaned = cleaned.replace(/^\+49(\d{3})(\d+)/, '+49 $1 $2');
+    } else if (cleaned.startsWith('0049')) {
+      // Convert 0049 to +49
+      cleaned = cleaned.replace(/^0049(\d{3})(\d+)/, '+49 $1 $2');
+    } else if (cleaned.startsWith('0')) {
+      // Convert 0171... to +49 171...
+      cleaned = cleaned.replace(/^0(\d{3})(\d+)/, '+49 $1 $2');
+    }
+
+    return cleaned;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -86,10 +128,15 @@ export default function CheckoutPage() {
 
       const targetSlug = restaurantSlug || 'limon-grillhaus';
 
+      // Format phone number for German validation
+      const formattedPhone = formatPhoneNumber(formData.customerPhone);
+      console.log('Original phone:', formData.customerPhone);
+      console.log('Formatted phone:', formattedPhone);
+
       // Submit order to backend
       const order = await ordersApi.createOrder(targetSlug, {
         customer_name: formData.customerName,
-        customer_phone: formData.customerPhone,
+        customer_phone: formattedPhone,
         customer_email: formData.customerEmail || undefined,
         delivery_method: formData.deliveryMethod,
         delivery_address: formData.deliveryMethod === 'delivery' ? formData.deliveryAddress : undefined,
