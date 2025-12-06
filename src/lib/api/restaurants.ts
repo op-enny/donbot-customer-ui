@@ -24,7 +24,8 @@ export interface MenuItem {
   price: number;
   image_url: string | null;
   category: string;
-  is_active: boolean;
+  is_available: boolean;
+  is_active?: boolean; // Deprecated, kept for backward compatibility
   is_popular?: boolean;
 }
 

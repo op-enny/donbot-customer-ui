@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { HeroBanner } from '@/components/layout/HeroBanner';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
 import { restaurantsApi, type Restaurant } from '@/lib/api';
+import { useLocationStore } from '@/lib/store/locationStore';
 
 // Mock data for development - will be replaced with real API calls
 const mockRestaurants: Restaurant[] = [
@@ -69,29 +70,32 @@ export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const { latitude, longitude, address, setLocation } = useLocationStore();
+  const [mounted, setMounted] = useState(false);
 
-  // Default to Köln (Test Restaurant location)
+  // Local state for search params (radius, term)
   const [searchParams, setSearchParams] = useState<{
-    latitude: number;
-    longitude: number;
     radius: number;
     searchTerm?: string;
   }>({
-    latitude: 50.9375,
-    longitude: 6.9603,
     radius: 10,
   });
 
-  const fetchRestaurants = async (params: typeof searchParams) => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const fetchRestaurants = async (lat: number, lng: number, radius: number, term?: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('Fetching restaurants with params:', params);
+      console.log('Fetching restaurants with params:', { lat, lng, radius, term });
       const data = await restaurantsApi.getNearbyRestaurants(
-        params.latitude,
-        params.longitude,
-        params.radius,
-        params.searchTerm
+        lat,
+        lng,
+        radius,
+        term
       );
 
       if (data && data.length > 0) {
@@ -109,23 +113,37 @@ export default function Home() {
     }
   };
 
-  // Initial load
+  // Initial load & when location changes
   useEffect(() => {
-    fetchRestaurants(searchParams);
-  }, []);
+    if (mounted) {
+      fetchRestaurants(latitude, longitude, searchParams.radius, searchParams.searchTerm);
+    }
+  }, [mounted, latitude, longitude, searchParams.radius, searchParams.searchTerm]);
 
-  const handleSearch = (params: { latitude: number; longitude: number; radius: number; searchTerm?: string }) => {
-    setSearchParams(params);
-    fetchRestaurants(params);
+  const handleSearch = (params: { latitude: number; longitude: number; radius: number; searchTerm?: string; address?: string }) => {
+    // Update store if location changed
+    if (params.latitude !== latitude || params.longitude !== longitude) {
+      setLocation(params.latitude, params.longitude, params.address || 'Unknown Location');
+    }
+    
+    setSearchParams({
+      radius: params.radius,
+      searchTerm: params.searchTerm
+    });
+    
+    // fetchRestaurants is triggered by useEffect
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen">
       {/* Hero Banner */}
       <HeroBanner 
         onSearch={handleSearch} 
-        initialLatitude={searchParams.latitude}
-        initialLongitude={searchParams.longitude}
+        initialLatitude={latitude}
+        initialLongitude={longitude}
+        initialAddress={address}
       />
 
       {/* Category Tabs */}

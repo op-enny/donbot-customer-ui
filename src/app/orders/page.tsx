@@ -2,22 +2,24 @@
 
 import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
+import { useState, useEffect } from 'react';
 
 export default function OrdersPage() {
-  // Mock data - will be replaced with actual order history from localStorage
-  const orders = [
-    {
-      id: '1',
-      orderNumber: 'LIM-2025-000017',
-      restaurantName: 'Limon Grillhaus',
-      restaurantSlug: 'limon-grillhaus',
-      status: 'preparing',
-      totalAmount: 13.0,
-      itemsSummary: '2x Döner im Brot',
-      createdAt: new Date().toISOString(),
-      trackingToken: 'abc123',
-    },
-  ];
+  const [mounted, setMounted] = useState(false);
+  const orders = useOrderHistoryStore((state) => state.orders);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -129,7 +131,7 @@ export default function OrdersPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-bold text-gray-900">
-                        {order.orderNumber}
+                        #{order.id.slice(0, 8).toUpperCase()}
                       </span>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -144,12 +146,10 @@ export default function OrdersPage() {
                   {getStatusIcon(order.status)}
                 </div>
 
-                <p className="text-sm text-gray-700 mb-3">{order.itemsSummary}</p>
-
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-sm mt-3">
                   <span className="text-gray-600">{formatDate(order.createdAt)}</span>
                   <span className="font-bold text-gray-900">
-                    €{order.totalAmount.toFixed(2)}
+                    €{order.total.toFixed(2)}
                   </span>
                 </div>
 

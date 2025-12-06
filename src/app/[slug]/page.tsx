@@ -34,6 +34,7 @@ const mockMenuData: MenuWithCategories = {
           price: 8.0,
           image_url: null,
           category: 'Döner & Dürüm',
+          is_available: true,
           is_active: true,
           is_popular: true,
         },
@@ -44,6 +45,7 @@ const mockMenuData: MenuWithCategories = {
           price: 12.0,
           image_url: null,
           category: 'Döner & Dürüm',
+          is_available: true,
           is_active: true,
           is_popular: false,
         },
@@ -54,6 +56,7 @@ const mockMenuData: MenuWithCategories = {
           price: 9.5,
           image_url: null,
           category: 'Döner & Dürüm',
+          is_available: true,
           is_active: true,
           is_popular: true,
         },
@@ -69,6 +72,7 @@ const mockMenuData: MenuWithCategories = {
           price: 7.5,
           image_url: null,
           category: 'Pizza',
+          is_available: true,
           is_active: true,
           is_popular: false,
         },
@@ -79,6 +83,7 @@ const mockMenuData: MenuWithCategories = {
           price: 9.0,
           image_url: null,
           category: 'Pizza',
+          is_available: true,
           is_active: true,
           is_popular: true,
         },
@@ -89,6 +94,7 @@ const mockMenuData: MenuWithCategories = {
           price: 10.5,
           image_url: null,
           category: 'Pizza',
+          is_available: true,
           is_active: true,
           is_popular: false,
         },
@@ -104,6 +110,7 @@ const mockMenuData: MenuWithCategories = {
           price: 2.5,
           image_url: null,
           category: 'Getränke',
+          is_available: true,
           is_active: true,
           is_popular: false,
         },
@@ -114,6 +121,7 @@ const mockMenuData: MenuWithCategories = {
           price: 2.0,
           image_url: null,
           category: 'Getränke',
+          is_available: true,
           is_active: true,
           is_popular: false,
         },
@@ -195,9 +203,19 @@ export default function RestaurantMenuPage() {
       {/* Restaurant Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-6">
-          {/* Banner Image Placeholder */}
-          <div className="w-full h-48 bg-gradient-to-r from-[#D32F2F] to-red-600 rounded-2xl mb-6 flex items-center justify-center">
-            <span className="text-6xl">🍽️</span>
+          {/* Banner Image */}
+          <div className="relative w-full h-48 rounded-2xl mb-6 overflow-hidden">
+            {restaurant.banner_image_url ? (
+              <img
+                src={restaurant.banner_image_url}
+                alt={restaurant.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-r from-[#D32F2F] to-red-600 flex items-center justify-center">
+                <span className="text-6xl">🍽️</span>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -283,7 +301,10 @@ export default function RestaurantMenuPage() {
             {categories.map((category) => (
               <button
                 key={category.name}
-                onClick={() => setActiveCategory(category.name)}
+                onClick={() => {
+                  setActiveCategory(category.name);
+                  document.getElementById(category.name)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
                 className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   activeCategory === category.name
                     ? 'bg-[#D32F2F] text-white shadow-md'
@@ -299,10 +320,8 @@ export default function RestaurantMenuPage() {
 
       {/* Menu Items by Category */}
       <div className="container mx-auto px-4 py-6">
-        {categories
-          ?.filter((category) => !activeCategory || category.name === activeCategory)
-          .map((category) => (
-            <div key={category.name} id={category.name} className="mb-8">
+        {categories?.map((category) => (
+            <div key={category.name} id={category.name} className="mb-8 scroll-mt-32">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {category.name}
               </h2>

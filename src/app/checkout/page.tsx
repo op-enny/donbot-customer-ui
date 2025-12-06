@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cartStore';
+import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
+import { useLocationStore } from '@/lib/store/locationStore';
 import { ordersApi } from '@/lib/api';
 import { ArrowLeft, CreditCard, Wallet, Smartphone, MapPin, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -43,6 +45,48 @@ export default function CheckoutPage() {
       router.push('/cart');
     }
   }, [mounted, items.length, router]);
+
+  // Load user info from local storage
+  useEffect(() => {
+    if (!mounted) return;
+
+    const storedData = localStorage.getItem('donbot_user_info');
+    let initialAddress = '';
+
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        const now = Date.now();
+        const fifteenDays = 15 * 24 * 60 * 60 * 1000;
+
+        if (now - parsedData.timestamp < fifteenDays) {
+          setFormData((prev) => ({
+            ...prev,
+            customerName: parsedData.customerName || '',
+            customerPhone: parsedData.customerPhone || '',
+            customerEmail: parsedData.customerEmail || '',
+            deliveryAddress: parsedData.deliveryAddress || '',
+          }));
+          initialAddress = parsedData.deliveryAddress || '';
+        } else {
+          localStorage.removeItem('donbot_user_info');
+        }
+      } catch (e) {
+        console.error('Failed to parse user info', e);
+      }
+    }
+
+    // If no address from user info, try location store
+    if (!initialAddress) {
+      const locationStore = useLocationStore.getState();
+      if (locationStore.isSet && locationStore.address) {
+        setFormData((prev) => ({
+          ...prev,
+          deliveryAddress: locationStore.address,
+        }));
+      }
+    }
+  }, [mounted]);
 
   // Show loading during hydration
   if (!mounted) {
@@ -144,6 +188,26 @@ export default function CheckoutPage() {
         items: orderItems,
         notes: formData.notes || undefined,
         idempotency_key: idempotencyKey,
+      });
+
+      // Save user info to local storage (15 days validity)
+      const userInfo = {
+        customerName: formData.customerName,
+        customerPhone: formData.customerPhone,
+        customerEmail: formData.customerEmail,
+        deliveryAddress: formData.deliveryAddress,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem('donbot_user_info', JSON.stringify(userInfo));
+
+      // Save to order history
+      useOrderHistoryStore.getState().addOrder({
+        id: order.id,
+        restaurantName: restaurantName || 'Restaurant',
+        total: grandTotal,
+        status: order.status,
+        createdAt: new Date().toISOString(),
+        trackingToken: order.tracking_token,
       });
 
       // Clear cart

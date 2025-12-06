@@ -8,12 +8,14 @@ interface SearchParams {
   longitude: number;
   radius: number;
   searchTerm?: string;
+  address?: string;
 }
 
 interface HeroBannerProps {
   onSearch: (params: SearchParams) => void;
   initialLatitude?: number;
   initialLongitude?: number;
+  initialAddress?: string;
 }
 
 // Helper function for reverse geocoding
@@ -39,9 +41,9 @@ async function getCityName(lat: number, lng: number): Promise<string> {
   }
 }
 
-export function HeroBanner({ onSearch, initialLatitude, initialLongitude }: HeroBannerProps) {
-  console.log('HeroBanner rendering', { initialLatitude, initialLongitude });
-  const [locationName, setLocationName] = useState<string | null>(null);
+export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initialAddress }: HeroBannerProps) {
+  console.log('HeroBanner rendering', { initialLatitude, initialLongitude, initialAddress });
+  const [locationName, setLocationName] = useState<string | null>(initialAddress || null);
   const [latitude, setLatitude] = useState<number | null>(initialLatitude || null);
   const [longitude, setLongitude] = useState<number | null>(initialLongitude || null);
   const [radius, setRadius] = useState(10); // Default 10km
@@ -55,10 +57,14 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude }: Hero
       setLatitude(initialLatitude);
       setLongitude(initialLongitude);
       
-      // Fetch city name instead of showing coordinates
-      getCityName(initialLatitude, initialLongitude).then(setLocationName);
+      if (initialAddress) {
+        setLocationName(initialAddress);
+      } else {
+        // Fetch city name instead of showing coordinates
+        getCityName(initialLatitude, initialLongitude).then(setLocationName);
+      }
     }
-  }, [initialLatitude, initialLongitude]);
+  }, [initialLatitude, initialLongitude, initialAddress]);
 
   const requestLocation = () => {
     setIsLoadingLocation(true);
@@ -87,6 +93,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude }: Hero
           longitude: lng,
           radius,
           searchTerm: searchTerm || undefined,
+          address: name,
         });
       },
       (error) => {
@@ -104,6 +111,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude }: Hero
         longitude,
         radius,
         searchTerm: searchTerm || undefined,
+        address: locationName || undefined,
       });
     } else {
       // If no location yet, try to get it first
