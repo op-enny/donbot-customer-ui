@@ -70,42 +70,63 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
+  // Default to Köln (Test Restaurant location)
+  const [searchParams, setSearchParams] = useState<{
+    latitude: number;
+    longitude: number;
+    radius: number;
+    searchTerm?: string;
+  }>({
+    latitude: 50.9375,
+    longitude: 6.9603,
+    radius: 10,
+  });
 
-    const fetchRestaurants = async () => {
-      try {
-        // Placeholder coordinates until geolocation/back end nearby endpoint is ready
-        const data = await restaurantsApi.getNearbyRestaurants(51.0504, 13.7373, 5);
+  const fetchRestaurants = async (params: typeof searchParams) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      console.log('Fetching restaurants with params:', params);
+      const data = await restaurantsApi.getNearbyRestaurants(
+        params.latitude,
+        params.longitude,
+        params.radius,
+        params.searchTerm
+      );
 
-        if (!isMounted) return;
-
-        if (data && data.length > 0) {
-          setRestaurants(data);
-        } else {
-          setRestaurants(mockRestaurants);
-        }
-      } catch (err) {
-        console.error('Failed to load restaurants, falling back to mock data.', err);
-        if (!isMounted) return;
-        setError('Using mock restaurants until the API is available.');
-        setRestaurants(mockRestaurants);
-      } finally {
-        if (isMounted) setIsLoading(false);
+      if (data && data.length > 0) {
+        setRestaurants(data);
+      } else {
+        console.log('No restaurants found from API');
+        setRestaurants([]); // Clear list if nothing found
       }
-    };
+    } catch (err) {
+      console.error('Failed to load restaurants:', err);
+      setError('Failed to load restaurants. Please try again.');
+      setRestaurants([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchRestaurants();
-
-    return () => {
-      isMounted = false;
-    };
+  // Initial load
+  useEffect(() => {
+    fetchRestaurants(searchParams);
   }, []);
+
+  const handleSearch = (params: { latitude: number; longitude: number; radius: number; searchTerm?: string }) => {
+    setSearchParams(params);
+    fetchRestaurants(params);
+  };
 
   return (
     <div className="min-h-screen">
       {/* Hero Banner */}
-      <HeroBanner />
+      <HeroBanner 
+        onSearch={handleSearch} 
+        initialLatitude={searchParams.latitude}
+        initialLongitude={searchParams.longitude}
+      />
 
       {/* Category Tabs */}
       <div className="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
@@ -132,6 +153,17 @@ export default function Home() {
 
       {/* Restaurant Grid */}
       <section className="container mx-auto px-4 py-6 pb-32">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {searchParams.searchTerm 
+              ? `Results for "${searchParams.searchTerm}"`
+              : 'Nearby Restaurants'}
+          </h2>
+          <span className="text-sm text-gray-500">
+            {restaurants.length} {restaurants.length === 1 ? 'place' : 'places'} found
+          </span>
+        </div>
+
         {error && (
           <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
             {error}
@@ -158,12 +190,20 @@ export default function Home() {
             {/* Empty State (shown when no restaurants) */}
             {restaurants.length === 0 && (
               <div className="text-center py-16">
+                <div className="text-6xl mb-4">🍽️</div>
                 <p className="text-xl text-muted-foreground mb-2">
                   No restaurants found
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Try adjusting your location or filters
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  We couldn't find any restaurants matching your criteria. 
+                  Try increasing the search radius or changing your location.
                 </p>
+                <button 
+                  onClick={() => handleSearch({...searchParams, radius: 50})}
+                  className="mt-6 text-[#D32F2F] font-semibold hover:underline"
+                >
+                  Expand radius to 50km
+                </button>
               </div>
             )}
           </>

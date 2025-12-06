@@ -8,6 +8,8 @@ export interface Restaurant {
   banner_image_url: string | null;
   cuisine_type: string | null;
   rating?: number;
+  address?: string;
+  phone?: string;
   delivery_time?: string;
   minimum_order?: number;
   delivery_fee?: number;
@@ -52,12 +54,27 @@ export const restaurantsApi = {
   },
 
   /**
-   * Get nearby restaurants (will be implemented when backend adds geolocation)
+   * Get nearby restaurants
    */
-  getNearbyRestaurants: async (latitude: number, longitude: number, radiusKm: number = 5): Promise<Restaurant[]> => {
-    // TODO: Backend endpoint not yet implemented
-    // For now, return mock data or empty array
-    console.warn('Geolocation API not yet implemented in backend');
-    return [];
+  getNearbyRestaurants: async (latitude: number, longitude: number, radiusKm: number = 5, searchTerm?: string): Promise<Restaurant[]> => {
+    try {
+      const params: any = {
+        latitude,
+        longitude,
+        radius: radiusKm * 1000, // Convert km to meters
+      };
+
+      if (searchTerm) {
+        params.search_text = searchTerm;
+      }
+
+      const response = await apiClient.get('/public/restaurants/nearby', {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching nearby restaurants:', error);
+      return [];
+    }
   },
 };

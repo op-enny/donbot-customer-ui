@@ -13,7 +13,7 @@ interface MenuItemProps {
     price: number;
     image_url: string | null;
     category: string;
-    is_available: boolean;
+    is_active: boolean;
     is_popular?: boolean;
   };
   restaurantId: string;
@@ -24,7 +24,7 @@ interface MenuItemProps {
 export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }: MenuItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (!item.is_available) return null;
+  if (!item.is_active) return null;
 
   return (
     <>

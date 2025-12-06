@@ -16,7 +16,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           {/* Logo */}
