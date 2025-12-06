@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search, User, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 
 export function Header() {
@@ -21,9 +22,15 @@ export function Header() {
         <div className="flex items-center gap-3">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-[#D32F2F] hover:text-red-700 transition-colors">
-              DonBot
-            </h1>
+            <div className="relative h-12 w-32">
+              <Image
+                src="/donbot-logo.png"
+                alt="DonBot"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
           </Link>
 
           {/* Search Bar */}
