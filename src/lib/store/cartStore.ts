@@ -7,7 +7,8 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  options: Record<string, string[]>; // Selected modifiers
+  options: Record<string, string[]>; // Selected modifiers (IDs)
+  selectedModifiers?: { groupName: string; options: string[] }[]; // Human readable for display
   specialInstructions?: string;
   image_url: string | null;
 }

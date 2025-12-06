@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 interface Modifier {
   id: string;
@@ -49,6 +50,7 @@ export function ItemModal({
   isOpen,
   onClose,
 }: ItemModalProps) {
+  const { t } = useLocaleStore();
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
   const [specialInstructions, setSpecialInstructions] = useState('');
@@ -91,6 +93,23 @@ export function ItemModal({
   };
 
   const handleAddToCart = () => {
+    // Prepare human-readable modifiers
+    const selectedModifiers = modifierGroups
+      .map((group) => {
+        const selectedIds = selectedOptions[group.id] || [];
+        if (selectedIds.length === 0) return null;
+
+        const names = group.modifiers
+          .filter((m) => selectedIds.includes(m.id))
+          .map((m) => m.name);
+
+        return {
+          groupName: group.name,
+          options: names,
+        };
+      })
+      .filter((item): item is { groupName: string; options: string[] } => item !== null);
+
     // Add item to cart using Zustand store
     addItem(
       {
@@ -99,6 +118,7 @@ export function ItemModal({
         price: calculateTotalPrice() / quantity, // Price per item (including extras)
         quantity,
         options: selectedOptions,
+        selectedModifiers,
         specialInstructions: specialInstructions || undefined,
         image_url: item.image_url,
       },
@@ -163,7 +183,7 @@ export function ItemModal({
                   {group.required && <span className="text-[#D32F2F] ml-1">*</span>}
                 </h4>
                 <p className="text-sm text-gray-600">
-                  {group.selection_type === 'single' ? 'Select one' : 'Select multiple'}
+                  {group.selection_type === 'single' ? t('select_one') : t('select_multiple')}
                 </p>
               </div>
 
@@ -198,11 +218,11 @@ export function ItemModal({
 
           {/* Special Instructions */}
           <div>
-            <h4 className="text-base font-semibold text-gray-900 mb-3">Special Instructions</h4>
+            <h4 className="text-base font-semibold text-gray-900 mb-3">{t('special_instructions')}</h4>
             <textarea
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
-              placeholder="Any special requests? (e.g., extra spicy, no onions)"
+              placeholder={t('placeholder_notes')}
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#D32F2F] focus:outline-none resize-none"
               rows={3}
             />
@@ -212,7 +232,7 @@ export function ItemModal({
         {/* Footer - Quantity & Add to Cart */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-700 font-medium">Quantity</span>
+            <span className="text-gray-700 font-medium">{t('quantity')}</span>
 
             <div className="flex items-center gap-3">
               <button
@@ -240,12 +260,12 @@ export function ItemModal({
             className="w-full bg-[#D32F2F] hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full flex items-center justify-center gap-3 transition-colors shadow-lg"
           >
             <ShoppingCart className="w-5 h-5" />
-            <span>Add to Cart - €{calculateTotalPrice().toFixed(2)}</span>
+            <span>{t('add_to_cart')} - €{calculateTotalPrice().toFixed(2)}</span>
           </button>
 
           {!isValid() && (
             <p className="text-sm text-[#D32F2F] text-center mt-2">
-              Please select all required options
+              {t('select_required')}
             </p>
           )}
         </div>

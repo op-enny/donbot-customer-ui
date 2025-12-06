@@ -7,11 +7,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
+import { useLocaleStore, t } from '@/lib/store/localeStore';
+import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const orders = useOrderHistoryStore((state) => state.orders);
+  const locale = useLocaleStore((state) => state.locale);
 
   const activeOrdersCount = orders.filter(
     (o) => !['delivered', 'cancelled', 'rejected', 'completed'].includes(o.status.toLowerCase())
@@ -44,10 +47,13 @@ export function Header() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Restaurant, cuisine, or dish"
+              placeholder={t('search_placeholder', locale)}
               className="pl-10 h-10 bg-secondary/50 border-none"
             />
           </div>
+
+          {/* Language Selector */}
+          {mounted && <LanguageSelector />}
 
           {/* Cart Icon with Badge */}
           <Link

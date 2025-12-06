@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 import { useLocationStore } from '@/lib/store/locationStore';
+import { useLocaleStore, translations } from '@/lib/store/localeStore';
 import { ordersApi } from '@/lib/api';
 import { ArrowLeft, CreditCard, Wallet, Smartphone, MapPin, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -13,6 +14,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { items, restaurantId, restaurantName, restaurantSlug, getTotalPrice, clearCart } = useCartStore();
+  const { locale } = useLocaleStore();
+  const t = translations[locale];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -207,7 +210,7 @@ export default function CheckoutPage() {
         total: grandTotal,
         status: order.status,
         createdAt: new Date().toISOString(),
-        trackingToken: order.tracking_token,
+        trackingToken: order.tracking_token || '',
       });
 
       // Clear cart
@@ -241,7 +244,7 @@ export default function CheckoutPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t['checkout']}</h1>
               <p className="text-sm text-gray-600">
                 from <span className="font-semibold">{restaurantName}</span>
               </p>
@@ -276,7 +279,7 @@ export default function CheckoutPage() {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name <span className="text-red-600">*</span>
+                      {t['name']} <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -287,7 +290,7 @@ export default function CheckoutPage() {
                       className={`w-full px-4 py-3 rounded-xl border-2 ${
                         formErrors.customerName ? 'border-red-500' : 'border-gray-200'
                       } focus:border-[#D32F2F] focus:outline-none transition-colors`}
-                      placeholder="Enter your full name"
+                      placeholder={t['name']}
                     />
                     {formErrors.customerName && (
                       <p className="text-sm text-red-600 mt-1">{formErrors.customerName}</p>
@@ -296,7 +299,7 @@ export default function CheckoutPage() {
 
                   <div>
                     <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number <span className="text-red-600">*</span>
+                      {t['phone']} <span className="text-red-600">*</span>
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -319,7 +322,7 @@ export default function CheckoutPage() {
 
                   <div>
                     <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email (Optional)
+                      {t['email']} ({t['optional']})
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -346,7 +349,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-[#D32F2F]" />
-                  Delivery Method
+                  {t['delivery_address']}
                 </h2>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -361,7 +364,7 @@ export default function CheckoutPage() {
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">🏪</div>
-                      <div className="font-semibold text-gray-900">Pickup</div>
+                      <div className="font-semibold text-gray-900">{t['pickup']}</div>
                       <div className="text-sm text-gray-600">Free</div>
                     </div>
                   </button>
@@ -377,7 +380,7 @@ export default function CheckoutPage() {
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">🚚</div>
-                      <div className="font-semibold text-gray-900">Delivery</div>
+                      <div className="font-semibold text-gray-900">{t['delivery']}</div>
                       <div className="text-sm text-gray-600">€{deliveryFee.toFixed(2)}</div>
                     </div>
                   </button>
@@ -386,7 +389,7 @@ export default function CheckoutPage() {
                 {formData.deliveryMethod === 'delivery' && (
                   <div>
                     <label htmlFor="deliveryAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                      Delivery Address <span className="text-red-600">*</span>
+                      {t['delivery_address']} <span className="text-red-600">*</span>
                     </label>
                     <textarea
                       id="deliveryAddress"
@@ -397,7 +400,7 @@ export default function CheckoutPage() {
                       className={`w-full px-4 py-3 rounded-xl border-2 ${
                         formErrors.deliveryAddress ? 'border-red-500' : 'border-gray-200'
                       } focus:border-[#D32F2F] focus:outline-none transition-colors resize-none`}
-                      placeholder="Street, Building, Apartment, City, Postal Code"
+                      placeholder={t['address']}
                     />
                     {formErrors.deliveryAddress && (
                       <p className="text-sm text-red-600 mt-1">{formErrors.deliveryAddress}</p>
@@ -410,7 +413,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5 text-[#D32F2F]" />
-                  Payment Method
+                  {t['payment_method']}
                 </h2>
 
                 <div className="space-y-3">
@@ -425,7 +428,7 @@ export default function CheckoutPage() {
                   >
                     <Wallet className="w-6 h-6 text-gray-700" />
                     <div className="text-left flex-1">
-                      <div className="font-semibold text-gray-900">Cash on {formData.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}</div>
+                      <div className="font-semibold text-gray-900">{t['cash']}</div>
                       <div className="text-sm text-gray-600">Pay with cash when you receive your order</div>
                     </div>
                   </button>
@@ -441,7 +444,7 @@ export default function CheckoutPage() {
                   >
                     <CreditCard className="w-6 h-6 text-gray-700" />
                     <div className="text-left flex-1">
-                      <div className="font-semibold text-gray-900">Card on {formData.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}</div>
+                      <div className="font-semibold text-gray-900">{t['card']}</div>
                       <div className="text-sm text-gray-600">Pay with card when you receive your order</div>
                     </div>
                   </button>
@@ -467,14 +470,14 @@ export default function CheckoutPage() {
 
               {/* Order Notes */}
               <div className="bg-white rounded-2xl shadow-md p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Order Notes (Optional)</h2>
+                <h2 className="text-lg font-bold text-gray-900 mb-4">{t['order_notes']} ({t['optional']})</h2>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#D32F2F] focus:outline-none transition-colors resize-none"
-                  placeholder="Any special requests or instructions for the restaurant?"
+                  placeholder={t['notes']}
                 />
               </div>
             </form>
@@ -483,7 +486,7 @@ export default function CheckoutPage() {
           {/* Order Summary (Sticky Sidebar) */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-md p-6 sticky top-[150px]">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{t['your_cart']}</h2>
 
               <div className="space-y-3 mb-6">
                 {items.map((item) => (
@@ -500,12 +503,12 @@ export default function CheckoutPage() {
 
               <div className="border-t border-gray-200 pt-4 space-y-2 mb-6">
                 <div className="flex justify-between text-gray-700">
-                  <span>Subtotal</span>
+                  <span>{t['subtotal']}</span>
                   <span className="font-medium">€{totalPrice.toFixed(2)}</span>
                 </div>
 
                 <div className="flex justify-between text-gray-700">
-                  <span>Delivery Fee</span>
+                  <span>{t['delivery_fee']}</span>
                   <span className="font-medium">
                     {deliveryFee > 0 ? `€${deliveryFee.toFixed(2)}` : 'Free'}
                   </span>
@@ -513,7 +516,7 @@ export default function CheckoutPage() {
 
                 <div className="border-t border-gray-200 pt-2">
                   <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
+                    <span>{t['total']}</span>
                     <span className="text-[#D32F2F]">€{grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
@@ -525,7 +528,7 @@ export default function CheckoutPage() {
                 disabled={isSubmitting}
                 className="w-full bg-[#D32F2F] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full transition-colors shadow-lg"
               >
-                {isSubmitting ? 'Placing Order...' : `Place Order - €${grandTotal.toFixed(2)}`}
+                {isSubmitting ? 'Placing Order...' : `${t['place_order']} - €${grandTotal.toFixed(2)}`}
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-4">

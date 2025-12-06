@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCartStore } from '@/lib/store/cartStore';
+import { useLocaleStore, translations } from '@/lib/store/localeStore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
@@ -9,6 +10,8 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 export default function CartPage() {
   const [mounted, setMounted] = useState(false);
   const { items, restaurantName, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
+  const { locale } = useLocaleStore();
+  const t = translations[locale];
 
   const totalPrice = getTotalPrice();
   const deliveryFee = 2.5; // TODO: Get from restaurant settings
@@ -39,9 +42,9 @@ export default function CartPage() {
             <ShoppingBag className="w-12 h-12 text-gray-400" />
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t['empty_cart']}</h1>
           <p className="text-gray-600 mb-8">
-            Add some delicious items from our restaurants to get started!
+            {t['search_placeholder']}
           </p>
 
           <Link
@@ -49,7 +52,7 @@ export default function CartPage() {
             className="inline-flex items-center gap-2 bg-[#D32F2F] hover:bg-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors shadow-lg"
           >
             <ArrowLeft className="w-5 h-5" />
-            Browse Restaurants
+            {t['nearby_restaurants']}
           </Link>
         </div>
       </div>
@@ -63,7 +66,7 @@ export default function CartPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Your Cart</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t['your_cart']}</h1>
               <p className="text-sm text-gray-600">
                 from <span className="font-semibold">{restaurantName}</span>
               </p>
@@ -74,7 +77,7 @@ export default function CartPage() {
               className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
-              Clear Cart
+              {t['clear_cart']}
             </button>
           </div>
         </div>
@@ -109,15 +112,24 @@ export default function CartPage() {
                     <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
 
                     {/* Selected Options */}
-                    {Object.entries(item.options).map(([groupKey, selectedIds]) => {
-                      if (selectedIds.length === 0) return null;
-                      return (
-                        <p key={groupKey} className="text-xs text-gray-600 mb-1">
-                          <span className="font-medium capitalize">{groupKey}:</span>{' '}
-                          {selectedIds.join(', ')}
+                    {item.selectedModifiers ? (
+                      item.selectedModifiers.map((modifier) => (
+                        <p key={modifier.groupName} className="text-xs text-gray-600 mb-1">
+                          <span className="font-medium capitalize">{modifier.groupName}:</span>{' '}
+                          {modifier.options.join(', ')}
                         </p>
-                      );
-                    })}
+                      ))
+                    ) : (
+                      Object.entries(item.options).map(([groupKey, selectedIds]) => {
+                        if (selectedIds.length === 0) return null;
+                        return (
+                          <p key={groupKey} className="text-xs text-gray-600 mb-1">
+                            <span className="font-medium capitalize">{groupKey}:</span>{' '}
+                            {selectedIds.join(', ')}
+                          </p>
+                        );
+                      })
+                    )}
 
                     {/* Special Instructions */}
                     {item.specialInstructions && (
@@ -178,22 +190,22 @@ export default function CartPage() {
 
         {/* Order Summary */}
         <div className="bg-white rounded-2xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Order Summary</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{t['your_cart']}</h2>
 
           <div className="space-y-3 mb-6">
             <div className="flex justify-between text-gray-700">
-              <span>Subtotal</span>
+              <span>{t['subtotal']}</span>
               <span className="font-medium">€{totalPrice.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between text-gray-700">
-              <span>Delivery Fee</span>
+              <span>{t['delivery_fee']}</span>
               <span className="font-medium">€{deliveryFee.toFixed(2)}</span>
             </div>
 
             <div className="border-t border-gray-200 pt-3">
               <div className="flex justify-between text-lg font-bold text-gray-900">
-                <span>Total</span>
+                <span>{t['total']}</span>
                 <span className="text-[#D32F2F]">€{grandTotal.toFixed(2)}</span>
               </div>
             </div>
@@ -204,7 +216,7 @@ export default function CartPage() {
             href="/checkout"
             className="block w-full bg-[#D32F2F] hover:bg-red-700 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
           >
-            Proceed to Checkout
+            {t['checkout']}
           </Link>
 
           {/* Continue Shopping */}
@@ -212,7 +224,7 @@ export default function CartPage() {
             href="/"
             className="block w-full text-center text-gray-600 hover:text-gray-900 font-medium py-3 mt-3"
           >
-            Continue Shopping
+            {t['back']}
           </Link>
         </div>
       </div>

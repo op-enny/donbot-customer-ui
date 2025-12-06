@@ -2,6 +2,7 @@
 
 import { MapPin, Search, Settings } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLocaleStore, translations } from '@/lib/store/localeStore';
 
 interface SearchParams {
   latitude: number;
@@ -43,6 +44,8 @@ async function getCityName(lat: number, lng: number): Promise<string> {
 
 export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initialAddress }: HeroBannerProps) {
   console.log('HeroBanner rendering', { initialLatitude, initialLongitude, initialAddress });
+  const { locale, t } = useLocaleStore();
+  
   const [locationName, setLocationName] = useState<string | null>(initialAddress || null);
   const [latitude, setLatitude] = useState<number | null>(initialLatitude || null);
   const [longitude, setLongitude] = useState<number | null>(initialLongitude || null);
@@ -70,7 +73,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
     setIsLoadingLocation(true);
 
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      alert(t('geolocation_unsupported'));
       setIsLoadingLocation(false);
       return;
     }
@@ -98,7 +101,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
       },
       (error) => {
         console.error('Error getting location:', error);
-        alert('Unable to get your location. Please enable location services.');
+        alert(t('location_error'));
         setIsLoadingLocation(false);
       }
     );
@@ -129,10 +132,10 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
 
       <div className="container mx-auto text-center max-w-3xl relative z-10">
         <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight font-display">
-          Hungry? We've got you!
+          {t('hero_title')}
         </h1>
         <p className="text-white/90 text-lg mb-8 max-w-xl mx-auto">
-          Find the best local restaurants near you. Order delivery or pickup.
+          {t('hero_subtitle')}
         </p>
 
         {/* Search Box Container */}
@@ -146,7 +149,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
             >
               <MapPin className={`w-5 h-5 ${isLoadingLocation ? 'animate-pulse text-[#D32F2F]' : 'text-[#D32F2F]'}`} />
               <span className="text-sm font-medium truncate max-w-[150px]">
-                {isLoadingLocation ? 'Locating...' : locationName ? locationName : 'Use my location'}
+                {isLoadingLocation ? t('locating') : locationName ? locationName : t('use_my_location')}
               </span>
             </button>
 
@@ -155,7 +158,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search for restaurants or cuisines..."
+                placeholder={t('search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -176,7 +179,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               onClick={handleSearch}
               className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 py-3 rounded-xl font-bold transition-colors shadow-sm"
             >
-              Search
+              {t('search')}
             </button>
           </div>
 
@@ -184,7 +187,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
           <div className={`border-t border-gray-100 mt-2 p-4 ${showFilters ? 'block' : 'hidden md:block'}`}>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                Search Radius: <span className="text-[#D32F2F] font-bold">{radius} km</span>
+                {t('search_radius')}: <span className="text-[#D32F2F] font-bold">{radius} km</span>
               </span>
               <input
                 type="range"

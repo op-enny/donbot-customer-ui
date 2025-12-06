@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { Clock, Star, MapPin, Phone } from 'lucide-react';
 import { MenuItem } from '@/components/menu/MenuItem';
 import { restaurantsApi, type MenuWithCategories } from '@/lib/api';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 // Mock menu data - will be replaced with API call
 const mockMenuData: MenuWithCategories = {
@@ -134,6 +135,7 @@ export default function RestaurantMenuPage() {
   const params = useParams();
   const slugParam = params.slug;
   const slug = Array.isArray(slugParam) ? slugParam[0] : (slugParam as string);
+  const { locale, t } = useLocaleStore();
 
   const [menuData, setMenuData] = useState<MenuWithCategories | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -171,7 +173,7 @@ export default function RestaurantMenuPage() {
     return () => {
       isMounted = false;
     };
-  }, [slug]);
+  }, [slug, locale]);
 
   if (isLoading) {
     return (
@@ -258,11 +260,11 @@ export default function RestaurantMenuPage() {
             <div>
               {restaurant.is_open ? (
                 <span className="bg-green-500 text-white text-sm font-semibold px-4 py-2 rounded-full">
-                  OPEN
+                  {t('open')}
                 </span>
               ) : (
                 <span className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-full">
-                  CLOSED
+                  {t('closed')}
                 </span>
               )}
             </div>
@@ -271,17 +273,17 @@ export default function RestaurantMenuPage() {
           {/* Delivery Info */}
           <div className="flex items-center gap-6 text-sm bg-gray-50 rounded-lg px-4 py-3">
             <div>
-              <span className="text-gray-600">Min. Order:</span>
+              <span className="text-gray-600">{t('min_order')}:</span>
               <span className="font-semibold ml-2">
                 €{(restaurant.minimum_order ?? 0).toFixed(2)}
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Delivery Fee:</span>
+              <span className="text-gray-600">{t('delivery_fee')}:</span>
               <span className="font-semibold ml-2">
                 {restaurant.delivery_fee && restaurant.delivery_fee > 0
                   ? `€${restaurant.delivery_fee.toFixed(2)}`
-                  : 'Free'}
+                  : t('free')}
               </span>
             </div>
             {restaurant.phone && (

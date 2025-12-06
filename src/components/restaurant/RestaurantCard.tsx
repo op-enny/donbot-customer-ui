@@ -3,12 +3,14 @@ import Image from 'next/image';
 import { Clock, Star, Euro } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { Restaurant } from '@/lib/api';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
 }
 
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
+  const { t } = useLocaleStore();
   const {
     slug,
     name,
@@ -49,9 +51,9 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
           {/* Open/Closed Status */}
           <div className="absolute bottom-2 left-2">
             {is_open ? (
-              <span className="status-badge-open">OPEN</span>
+              <span className="status-badge-open">{t('open')}</span>
             ) : (
-              <span className="status-badge-closed">CLOSED</span>
+              <span className="status-badge-closed">{t('closed')}</span>
             )}
           </div>
         </div>
@@ -86,7 +88,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
             <div className="flex items-center gap-1">
               <Euro className="w-3.5 h-3.5" />
-              <span>{delivery_fee > 0 ? `€${delivery_fee.toFixed(2)}` : 'Free'}</span>
+              <span>{delivery_fee > 0 ? `€${delivery_fee.toFixed(2)}` : t('free')}</span>
             </div>
 
             {distance && (

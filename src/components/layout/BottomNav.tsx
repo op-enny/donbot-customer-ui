@@ -3,17 +3,19 @@
 import { Home, Search, ShoppingCart, Heart, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-
-const navItems = [
-  { icon: Home, label: 'Home', href: '/' },
-  { icon: Search, label: 'Search', href: '/search' },
-  { icon: ShoppingCart, label: 'Cart', href: '/cart' },
-  { icon: Heart, label: 'Favorites', href: '/favorites' },
-  { icon: User, label: 'Profile', href: '/profile' },
-];
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useLocaleStore();
+
+  const navItems = [
+    { icon: Home, label: t('home'), href: '/' },
+    { icon: Search, label: t('search'), href: '/search' },
+    { icon: ShoppingCart, label: t('cart'), href: '/cart' },
+    { icon: Heart, label: t('favorites'), href: '/favorites' },
+    { icon: User, label: t('profile'), href: '/profile' },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border shadow-lg">

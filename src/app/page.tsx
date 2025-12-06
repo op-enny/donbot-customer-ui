@@ -5,6 +5,7 @@ import { HeroBanner } from '@/components/layout/HeroBanner';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
 import { restaurantsApi, type Restaurant } from '@/lib/api';
 import { useLocationStore } from '@/lib/store/locationStore';
+import { useLocaleStore, translations } from '@/lib/store/localeStore';
 
 // Mock data for development - will be replaced with real API calls
 const mockRestaurants: Restaurant[] = [
@@ -72,6 +73,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   
   const { latitude, longitude, address, setLocation } = useLocationStore();
+  const { locale, t } = useLocaleStore();
   const [mounted, setMounted] = useState(false);
 
   // Local state for search params (radius, term)
@@ -118,7 +120,7 @@ export default function Home() {
     if (mounted) {
       fetchRestaurants(latitude, longitude, searchParams.radius, searchParams.searchTerm);
     }
-  }, [mounted, latitude, longitude, searchParams.radius, searchParams.searchTerm]);
+  }, [mounted, latitude, longitude, searchParams.radius, searchParams.searchTerm, locale]);
 
   const handleSearch = (params: { latitude: number; longitude: number; radius: number; searchTerm?: string; address?: string }) => {
     // Update store if location changed
@@ -151,19 +153,19 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide">
             <button className="px-6 py-2.5 rounded-full text-sm font-semibold bg-[#D32F2F] text-white shadow-md whitespace-nowrap">
-              Nearby
+              {t('nearby')}
             </button>
             <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
-              Top Rated
+              {t('top_rated')}
             </button>
             <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
-              Fast Delivery
+              {t('fast_delivery')}
             </button>
             <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
-              Free Delivery
+              {t('free_delivery')}
             </button>
             <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
-              Popular
+              {t('popular')}
             </button>
           </div>
         </div>
@@ -172,19 +174,19 @@ export default function Home() {
       {/* Restaurant Grid */}
       <section className="container mx-auto px-4 py-6 pb-32">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-xl font-bold text-gray-900">
             {searchParams.searchTerm 
-              ? `Results for "${searchParams.searchTerm}"`
-              : 'Nearby Restaurants'}
+              ? `${t('search')}: "${searchParams.searchTerm}"`
+              : t('nearby_restaurants')}
           </h2>
           <span className="text-sm text-gray-500">
-            {restaurants.length} {restaurants.length === 1 ? 'place' : 'places'} found
+            {restaurants.length} {restaurants.length === 1 ? t('places_found').replace('places', 'place') : t('places_found')}
           </span>
         </div>
 
         {error && (
           <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-            {error}
+            {t('error_generic')}
           </div>
         )}
 
@@ -210,14 +212,19 @@ export default function Home() {
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">🍽️</div>
                 <p className="text-xl text-muted-foreground mb-2">
-                  No restaurants found
+                  {t('no_restaurants')}
                 </p>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  We couldn't find any restaurants matching your criteria. 
-                  Try increasing the search radius or changing your location.
+                  {t('error_not_found')}
                 </p>
                 <button 
-                  onClick={() => handleSearch({...searchParams, radius: 50})}
+                  onClick={() => handleSearch({
+                    ...searchParams, 
+                    radius: 50,
+                    latitude,
+                    longitude,
+                    address
+                  })}
                   className="mt-6 text-[#D32F2F] font-semibold hover:underline"
                 >
                   Expand radius to 50km
