@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, User, ShoppingCart } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { User, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
-import { useLocaleStore, t } from '@/lib/store/localeStore';
+import { useLocaleStore } from '@/lib/store/localeStore';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 export function Header() {
@@ -42,15 +41,8 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Search Bar */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t('search_placeholder', locale)}
-              className="pl-10 h-10 bg-secondary/50 border-none"
-            />
-          </div>
+          {/* Spacer */}
+          <div className="flex-1" />
 
           {/* Language Selector */}
           {mounted && <LanguageSelector />}
