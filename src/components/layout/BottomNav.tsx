@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Search, ShoppingCart, Heart, User } from 'lucide-react';
+import { Home, ShoppingCart, Heart, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';
@@ -11,7 +11,6 @@ export function BottomNav() {
 
   const navItems = [
     { icon: Home, label: t('home'), href: '/' },
-    { icon: Search, label: t('search'), href: '/search' },
     { icon: ShoppingCart, label: t('cart'), href: '/cart' },
     { icon: Heart, label: t('favorites'), href: '/favorites' },
     { icon: User, label: t('profile'), href: '/profile' },
