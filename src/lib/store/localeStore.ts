@@ -112,6 +112,54 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'error_generic': 'Ein Fehler ist aufgetreten',
     'error_network': 'Netzwerkfehler',
     'error_not_found': 'Nicht gefunden',
+
+    // Order Tracking
+    'back_to_home': 'Zurück zur Startseite',
+    'order_tracking': 'Bestellverfolgung',
+    'tracking_unavailable': 'Nachverfolgung nicht verfügbar',
+    'tracking_token_missing': 'Tracking-Token fehlt. Bitte verwenden Sie den Bestätigungslink aus der Bestellung.',
+    'unable_to_load_order': 'Bestellstatus konnte nicht geladen werden. Bitte versuchen Sie es erneut oder kontaktieren Sie das Restaurant.',
+    'order_id': 'Bestell-ID',
+    'restaurant': 'Restaurant',
+    'payment': 'Zahlung',
+    'method': 'Methode',
+    'status': 'Status',
+    'fulfillment': 'Erfüllung',
+    'estimated_ready_time': 'Geschätzte Fertigstellung',
+    'back_to_restaurants': 'Zurück zu Restaurants',
+    'view_order_history': 'Bestellverlauf ansehen',
+    'order_items': 'Bestellte Artikel',
+    'item': 'Artikel',
+    'price': 'Preis',
+
+    // Order Status Values
+    'status_new': 'Neu',
+    'status_confirmed': 'Bestätigt',
+    'status_preparing': 'In Zubereitung',
+    'status_ready': 'Bereit zur Abholung',
+    'status_out_for_delivery': 'Wird ausgeliefert',
+    'status_completed': 'Abgeschlossen',
+    'status_cancelled': 'Storniert',
+
+    // Payment Status
+    'payment_status_unpaid': 'Unbezahlt',
+    'payment_status_paid': 'Bezahlt',
+    'payment_status_refunded': 'Erstattet',
+
+    // Profile Page
+    'guest_user': 'Gastbenutzer',
+    'not_logged_in': 'Nicht angemeldet',
+    'sign_in_register': 'Anmelden / Registrieren',
+    'my_orders': 'Meine Bestellungen',
+    'saved_addresses': 'Gespeicherte Adressen',
+    'payment_methods': 'Zahlungsmethoden',
+    'settings_privacy': 'Einstellungen & Datenschutz',
+    'about': 'Über',
+    'version': 'Version',
+    'terms_of_service': 'Nutzungsbedingungen',
+    'privacy_policy': 'Datenschutzerklärung',
+    'contact_support': 'Support kontaktieren',
+    'sign_out': 'Abmelden',
   },
   en: {
     // Header & Navigation
@@ -209,6 +257,54 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'error_generic': 'An error occurred',
     'error_network': 'Network error',
     'error_not_found': 'Not found',
+
+    // Order Tracking
+    'back_to_home': 'Back to home',
+    'order_tracking': 'Order Tracking',
+    'tracking_unavailable': 'Tracking unavailable',
+    'tracking_token_missing': 'Tracking token is missing. Please use the confirmation link from checkout.',
+    'unable_to_load_order': 'Unable to load order status. Please try again or contact the restaurant.',
+    'order_id': 'Order ID',
+    'restaurant': 'Restaurant',
+    'payment': 'Payment',
+    'method': 'Method',
+    'status': 'Status',
+    'fulfillment': 'Fulfillment',
+    'estimated_ready_time': 'Estimated Ready Time',
+    'back_to_restaurants': 'Back to restaurants',
+    'view_order_history': 'View order history',
+    'order_items': 'Order Items',
+    'item': 'Item',
+    'price': 'Price',
+
+    // Order Status Values
+    'status_new': 'New',
+    'status_confirmed': 'Confirmed',
+    'status_preparing': 'Preparing',
+    'status_ready': 'Ready for Pickup',
+    'status_out_for_delivery': 'Out for Delivery',
+    'status_completed': 'Completed',
+    'status_cancelled': 'Cancelled',
+
+    // Payment Status
+    'payment_status_unpaid': 'Unpaid',
+    'payment_status_paid': 'Paid',
+    'payment_status_refunded': 'Refunded',
+
+    // Profile Page
+    'guest_user': 'Guest User',
+    'not_logged_in': 'Not logged in',
+    'sign_in_register': 'Sign In / Register',
+    'my_orders': 'My Orders',
+    'saved_addresses': 'Saved Addresses',
+    'payment_methods': 'Payment Methods',
+    'settings_privacy': 'Settings & Privacy',
+    'about': 'About',
+    'version': 'Version',
+    'terms_of_service': 'Terms of Service',
+    'privacy_policy': 'Privacy Policy',
+    'contact_support': 'Contact Support',
+    'sign_out': 'Sign Out',
   },
   tr: {
     // Header & Navigation
@@ -306,6 +402,54 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'error_generic': 'Bir hata oluştu',
     'error_network': 'Ağ hatası',
     'error_not_found': 'Bulunamadı',
+
+    // Order Tracking
+    'back_to_home': 'Ana sayfaya dön',
+    'order_tracking': 'Sipariş Takibi',
+    'tracking_unavailable': 'Takip kullanılamıyor',
+    'tracking_token_missing': 'Takip kodu eksik. Lütfen ödeme sonrası gönderilen onay linkini kullanın.',
+    'unable_to_load_order': 'Sipariş durumu yüklenemedi. Lütfen tekrar deneyin veya restoranla iletişime geçin.',
+    'order_id': 'Sipariş No',
+    'restaurant': 'Restoran',
+    'payment': 'Ödeme',
+    'method': 'Yöntem',
+    'status': 'Durum',
+    'fulfillment': 'Teslim',
+    'estimated_ready_time': 'Tahmini Hazır Olma',
+    'back_to_restaurants': 'Restoranlara dön',
+    'view_order_history': 'Sipariş geçmişini görüntüle',
+    'order_items': 'Sipariş Ürünleri',
+    'item': 'Ürün',
+    'price': 'Fiyat',
+
+    // Order Status Values
+    'status_new': 'Yeni',
+    'status_confirmed': 'Onaylandı',
+    'status_preparing': 'Hazırlanıyor',
+    'status_ready': 'Hazır',
+    'status_out_for_delivery': 'Yolda',
+    'status_completed': 'Tamamlandı',
+    'status_cancelled': 'İptal Edildi',
+
+    // Payment Status
+    'payment_status_unpaid': 'Ödenmedi',
+    'payment_status_paid': 'Ödendi',
+    'payment_status_refunded': 'İade Edildi',
+
+    // Profile Page
+    'guest_user': 'Misafir Kullanıcı',
+    'not_logged_in': 'Giriş yapılmadı',
+    'sign_in_register': 'Giriş Yap / Kayıt Ol',
+    'my_orders': 'Siparişlerim',
+    'saved_addresses': 'Kayıtlı Adresler',
+    'payment_methods': 'Ödeme Yöntemleri',
+    'settings_privacy': 'Ayarlar & Gizlilik',
+    'about': 'Hakkında',
+    'version': 'Sürüm',
+    'terms_of_service': 'Kullanım Koşulları',
+    'privacy_policy': 'Gizlilik Politikası',
+    'contact_support': 'Destek İletişim',
+    'sign_out': 'Çıkış Yap',
   },
 };
 

@@ -19,6 +19,14 @@ export interface CreateOrderDto {
   idempotency_key?: string;
 }
 
+export interface OrderItemWithDetails {
+  menu_item_name: string;
+  quantity: number;
+  price_snapshot: number;
+  options?: Record<string, any>;
+  special_instructions?: string;
+}
+
 export interface Order {
   id: string;
   restaurant_id: string;
@@ -37,6 +45,7 @@ export interface Order {
   tracking_token?: string;
   tracking_url?: string;
   estimated_ready_time?: string;
+  items?: OrderItemWithDetails[];
 }
 
 export const ordersApi = {

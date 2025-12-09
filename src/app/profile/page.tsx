@@ -2,14 +2,17 @@
 
 import { User, MapPin, CreditCard, Bell, Lock, LogOut, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 export default function ProfilePage() {
+  const t = useLocaleStore((state) => state.t);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('profile')}</h1>
         </div>
       </div>
 
@@ -21,12 +24,12 @@ export default function ProfilePage() {
               <User className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Guest User</h2>
-              <p className="text-sm text-gray-600">Not logged in</p>
+              <h2 className="text-xl font-bold text-gray-900">{t('guest_user')}</h2>
+              <p className="text-sm text-gray-600">{t('not_logged_in')}</p>
             </div>
           </div>
           <button className="w-full bg-[#D32F2F] hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors">
-            Sign In / Register
+            {t('sign_in_register')}
           </button>
         </div>
 
@@ -40,7 +43,7 @@ export default function ProfilePage() {
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
                 <Bell className="w-5 h-5 text-blue-600" />
               </div>
-              <span className="font-medium text-gray-900">My Orders</span>
+              <span className="font-medium text-gray-900">{t('my_orders')}</span>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -53,7 +56,7 @@ export default function ProfilePage() {
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
                 <MapPin className="w-5 h-5 text-green-600" />
               </div>
-              <span className="font-medium text-gray-900">Saved Addresses</span>
+              <span className="font-medium text-gray-900">{t('saved_addresses')}</span>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -66,7 +69,7 @@ export default function ProfilePage() {
               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-purple-600" />
               </div>
-              <span className="font-medium text-gray-900">Payment Methods</span>
+              <span className="font-medium text-gray-900">{t('payment_methods')}</span>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -79,7 +82,7 @@ export default function ProfilePage() {
               <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
                 <Lock className="w-5 h-5 text-gray-600" />
               </div>
-              <span className="font-medium text-gray-900">Settings & Privacy</span>
+              <span className="font-medium text-gray-900">{t('settings_privacy')}</span>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -87,22 +90,22 @@ export default function ProfilePage() {
 
         {/* App Info */}
         <div className="bg-white rounded-2xl shadow-md p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">About</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t('about')}</h3>
           <div className="space-y-3 text-sm text-gray-600">
             <div className="flex justify-between">
-              <span>Version</span>
+              <span>{t('version')}</span>
               <span className="font-medium">1.0.0</span>
             </div>
             <div className="flex justify-between">
-              <span>Terms of Service</span>
+              <span>{t('terms_of_service')}</span>
               <ChevronRight className="w-4 h-4" />
             </div>
             <div className="flex justify-between">
-              <span>Privacy Policy</span>
+              <span>{t('privacy_policy')}</span>
               <ChevronRight className="w-4 h-4" />
             </div>
             <div className="flex justify-between">
-              <span>Contact Support</span>
+              <span>{t('contact_support')}</span>
               <ChevronRight className="w-4 h-4" />
             </div>
           </div>
@@ -112,7 +115,7 @@ export default function ProfilePage() {
         <div className="mt-6">
           <button className="w-full flex items-center justify-center gap-2 bg-white border-2 border-red-200 text-red-600 hover:bg-red-50 font-semibold py-3 rounded-xl transition-colors shadow-md">
             <LogOut className="w-5 h-5" />
-            Sign Out
+            {t('sign_out')}
           </button>
         </div>
       </div>
