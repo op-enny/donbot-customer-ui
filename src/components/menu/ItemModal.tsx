@@ -141,8 +141,8 @@ export function ItemModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
-      <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50">
+      <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[85vh] overflow-y-auto pb-24 sm:pb-0">
         {/* Modal Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">Customize your order</h2>
@@ -230,7 +230,7 @@ export function ItemModal({
         </div>
 
         {/* Footer - Quantity & Add to Cart */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
+        <div className="sticky bottom-0 sm:bottom-0 bg-white border-t border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-700 font-medium">{t('quantity')}</span>
 
