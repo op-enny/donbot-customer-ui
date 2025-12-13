@@ -20,6 +20,8 @@ interface MenuItemProps {
   restaurantId: string;
   restaurantName: string;
   restaurantSlug: string;
+  deliveryFee?: number;
+  minimumOrder?: number;
 }
 
 export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }: MenuItemProps) {

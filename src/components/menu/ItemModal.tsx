@@ -37,6 +37,8 @@ interface ItemModalProps {
   restaurantId?: string;
   restaurantName?: string;
   restaurantSlug?: string;
+  deliveryFee?: number;
+  minimumOrder?: number;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -48,6 +50,8 @@ export function ItemModal({
   restaurantId = '1',
   restaurantName = 'Limon Grillhaus',
   restaurantSlug = 'limon-grillhaus',
+  deliveryFee = 0,
+  minimumOrder = 0,
   isOpen,
   onClose,
 }: ItemModalProps) {
@@ -125,6 +129,14 @@ export function ItemModal({
       image_url: item.image_url,
     };
 
+    const restaurantInfo = {
+      restaurantId,
+      restaurantName,
+      restaurantSlug,
+      deliveryFee,
+      minimumOrder,
+    };
+
     // Check for restaurant conflict
     const conflict = checkRestaurantConflict(restaurantId);
 
@@ -139,14 +151,14 @@ export function ItemModal({
       });
 
       if (shouldClear) {
-        addItemAfterClear(cartItem, restaurantId, restaurantName, restaurantSlug);
+        addItemAfterClear(cartItem, restaurantInfo);
         onClose();
       }
       return;
     }
 
     // No conflict, add item normally
-    addItem(cartItem, restaurantId, restaurantName, restaurantSlug);
+    addItem(cartItem, restaurantInfo);
     onClose();
   };
 

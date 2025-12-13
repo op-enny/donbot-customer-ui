@@ -54,6 +54,8 @@ export const useCartStore = create<CartStore>()(
       restaurantId: null,
       restaurantName: null,
       restaurantSlug: null,
+      deliveryFee: 0,
+      minimumOrder: 0,
 
       // Check if adding from a different restaurant would conflict
       checkRestaurantConflict: (restaurantId: string): CartConflict => {
@@ -67,7 +69,8 @@ export const useCartStore = create<CartStore>()(
         return { hasConflict: false, currentRestaurantName: null };
       },
 
-      addItem: (item, restaurantId, restaurantName, restaurantSlug) => {
+      addItem: (item, restaurantInfo) => {
+        const { restaurantId, restaurantName, restaurantSlug, deliveryFee, minimumOrder } = restaurantInfo;
         const currentRestaurantId = get().restaurantId;
 
         // If cart has items from a different restaurant, do nothing
@@ -90,11 +93,14 @@ export const useCartStore = create<CartStore>()(
           restaurantId,
           restaurantName,
           restaurantSlug,
+          deliveryFee: deliveryFee ?? state.deliveryFee,
+          minimumOrder: minimumOrder ?? state.minimumOrder,
         }));
       },
 
       // Add item after clearing cart (used when user confirms clearing)
-      addItemAfterClear: (item, restaurantId, restaurantName, restaurantSlug) => {
+      addItemAfterClear: (item, restaurantInfo) => {
+        const { restaurantId, restaurantName, restaurantSlug, deliveryFee, minimumOrder } = restaurantInfo;
         // Clear cart and add new item
         const cartItemId = `${item.menuItemId}-${Date.now()}-${Math.random()}`;
         set({
@@ -102,6 +108,8 @@ export const useCartStore = create<CartStore>()(
           restaurantId,
           restaurantName,
           restaurantSlug,
+          deliveryFee: deliveryFee ?? 0,
+          minimumOrder: minimumOrder ?? 0,
         });
       },
 
@@ -114,6 +122,8 @@ export const useCartStore = create<CartStore>()(
             restaurantId: newItems.length === 0 ? null : state.restaurantId,
             restaurantName: newItems.length === 0 ? null : state.restaurantName,
             restaurantSlug: newItems.length === 0 ? null : state.restaurantSlug,
+            deliveryFee: newItems.length === 0 ? 0 : state.deliveryFee,
+            minimumOrder: newItems.length === 0 ? 0 : state.minimumOrder,
           };
         });
       },
@@ -132,7 +142,14 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => {
-        set({ items: [], restaurantId: null, restaurantName: null, restaurantSlug: null });
+        set({
+          items: [],
+          restaurantId: null,
+          restaurantName: null,
+          restaurantSlug: null,
+          deliveryFee: 0,
+          minimumOrder: 0,
+        });
       },
 
       getTotalItems: () => {
@@ -144,6 +161,14 @@ export const useCartStore = create<CartStore>()(
           (total, item) => total + item.price * item.quantity,
           0
         );
+      },
+
+      getDeliveryFee: () => {
+        return get().deliveryFee;
+      },
+
+      getMinimumOrder: () => {
+        return get().minimumOrder;
       },
     }),
     {
