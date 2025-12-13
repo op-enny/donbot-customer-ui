@@ -108,17 +108,44 @@ export default function CheckoutPage() {
     return null;
   }
 
+  // Strict German phone number validation
+  const isValidGermanPhone = (phone: string): boolean => {
+    // Remove all whitespace and dashes for validation
+    const cleaned = phone.replace(/[\s-]/g, '');
+
+    // Valid formats:
+    // +49XXXXXXXXXX (10-14 digits after +49)
+    // 0049XXXXXXXXXX (10-14 digits after 0049)
+    // 0XXXXXXXXXX (10-12 digits starting with 0)
+    const germanPhoneRegex = /^(\+49|0049|0)[1-9]\d{8,13}$/;
+
+    return germanPhoneRegex.test(cleaned);
+  };
+
+  // Sanitize text input to prevent XSS and limit length
+  const sanitizeInput = (input: string, maxLength: number = 500): string => {
+    return input
+      .trim()
+      .slice(0, maxLength)
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/[<>]/g, ''); // Remove remaining angle brackets
+  };
+
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
     if (!formData.customerName.trim()) {
       errors.customerName = 'Name is required';
+    } else if (formData.customerName.trim().length < 2) {
+      errors.customerName = 'Name must be at least 2 characters';
+    } else if (formData.customerName.trim().length > 100) {
+      errors.customerName = 'Name must be less than 100 characters';
     }
 
     if (!formData.customerPhone.trim()) {
       errors.customerPhone = 'Phone number is required';
-    } else if (!/^\+?[0-9\s-]{10,}$/.test(formData.customerPhone)) {
-      errors.customerPhone = 'Invalid phone number';
+    } else if (!isValidGermanPhone(formData.customerPhone)) {
+      errors.customerPhone = 'Please enter a valid German phone number (e.g., +49 171 1234567)';
     }
 
     if (formData.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
@@ -127,6 +154,11 @@ export default function CheckoutPage() {
 
     if (formData.deliveryMethod === 'delivery' && !formData.deliveryAddress.trim()) {
       errors.deliveryAddress = 'Delivery address is required';
+    }
+
+    // Validate notes length
+    if (formData.notes && formData.notes.length > 500) {
+      errors.notes = 'Notes must be less than 500 characters';
     }
 
     setFormErrors(errors);
@@ -177,19 +209,22 @@ export default function CheckoutPage() {
 
       // Format phone number for German validation
       const formattedPhone = formatPhoneNumber(formData.customerPhone);
-      console.log('Original phone:', formData.customerPhone);
-      console.log('Formatted phone:', formattedPhone);
 
-      // Submit order to backend
+      // Submit order to backend with sanitized inputs
       const order = await ordersApi.createOrder(targetSlug, {
-        customer_name: formData.customerName,
+        customer_name: sanitizeInput(formData.customerName, 100),
         customer_phone: formattedPhone,
-        customer_email: formData.customerEmail || undefined,
+        customer_email: formData.customerEmail ? sanitizeInput(formData.customerEmail, 255) : undefined,
         delivery_method: formData.deliveryMethod,
-        delivery_address: formData.deliveryMethod === 'delivery' ? formData.deliveryAddress : undefined,
+        delivery_address: formData.deliveryMethod === 'delivery' ? sanitizeInput(formData.deliveryAddress, 500) : undefined,
         payment_method: formData.paymentMethod,
-        items: orderItems,
-        notes: formData.notes || undefined,
+        items: orderItems.map((item) => ({
+          ...item,
+          special_instructions: item.special_instructions
+            ? sanitizeInput(item.special_instructions, 500)
+            : undefined,
+        })),
+        notes: formData.notes ? sanitizeInput(formData.notes, 500) : undefined,
         idempotency_key: idempotencyKey,
       });
 
@@ -216,10 +251,18 @@ export default function CheckoutPage() {
       // Clear cart
       clearCart();
 
-      // Redirect to order confirmation
-      router.push(`/orders/${order.id}?token=${order.tracking_token}`);
+      // Store tracking token securely in sessionStorage instead of URL
+      // This prevents token exposure via browser history and Referer headers
+      if (order.tracking_token) {
+        sessionStorage.setItem(`order_token_${order.id}`, order.tracking_token);
+      }
+
+      // Redirect to order confirmation without token in URL
+      router.push(`/orders/${order.id}`);
     } catch (err: any) {
-      console.error('Order submission error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Order submission error:', err);
+      }
       setError(err.response?.data?.message || 'Failed to place order. Please try again.');
       setIsSubmitting(false);
     }

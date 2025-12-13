@@ -1,7 +1,7 @@
 'use client';
 
 import { MapPin, Search, Settings } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocaleStore, translations } from '@/lib/store/localeStore';
 
 interface SearchParams {
@@ -19,31 +19,66 @@ interface HeroBannerProps {
   initialAddress?: string;
 }
 
-// Helper function for reverse geocoding
+// Simple in-memory cache for geocoding results (15 min TTL)
+const geocodeCache = new Map<string, { value: string; timestamp: number }>();
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
+// Rate limiter for Nominatim API (max 1 request per second)
+let lastNominatimRequest = 0;
+const NOMINATIM_RATE_LIMIT = 1000; // 1 second
+
+async function rateLimitedFetch(url: string): Promise<Response> {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastNominatimRequest;
+
+  if (timeSinceLastRequest < NOMINATIM_RATE_LIMIT) {
+    await new Promise((resolve) => setTimeout(resolve, NOMINATIM_RATE_LIMIT - timeSinceLastRequest));
+  }
+
+  lastNominatimRequest = Date.now();
+  return fetch(url, {
+    headers: {
+      'User-Agent': 'DonBot-CustomerUI/1.0 (https://donbot.com)',
+    },
+  });
+}
+
+// Helper function for reverse geocoding with caching and rate limiting
 async function getCityName(lat: number, lng: number): Promise<string> {
+  // Round coordinates to reduce cache misses for nearby locations
+  const cacheKey = `${lat.toFixed(3)},${lng.toFixed(3)}`;
+
+  // Check cache first
+  const cached = geocodeCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.value;
+  }
+
   try {
-    const response = await fetch(
+    const response = await rateLimitedFetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=12`
     );
     const data = await response.json();
-    
+
     // Try to find the most relevant location name
     const address = data.address || {};
     const city = address.city || address.town || address.village || address.suburb || address.district;
-    
-    if (city) {
-      return city;
-    }
-    
-    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+    const result = city || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+    // Cache the result
+    geocodeCache.set(cacheKey, { value: result, timestamp: Date.now() });
+
+    return result;
   } catch (error) {
-    console.error('Error fetching city name:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching city name:', error);
+    }
     return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   }
 }
 
 export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initialAddress }: HeroBannerProps) {
-  console.log('HeroBanner rendering', { initialLatitude, initialLongitude, initialAddress });
   const { locale, t } = useLocaleStore();
   
   const [locationName, setLocationName] = useState<string | null>(initialAddress || null);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Clock, Star, MapPin, Phone } from 'lucide-react';
+import Image from 'next/image';
 import { MenuItem } from '@/components/menu/MenuItem';
 import { restaurantsApi, type MenuWithCategories } from '@/lib/api';
 import { useLocaleStore } from '@/lib/store/localeStore';
@@ -158,11 +159,17 @@ export default function RestaurantMenuPage() {
         setMenuData(data);
         setActiveCategory(data.categories[0]?.name ?? null);
       } catch (err) {
-        console.error('Failed to load menu, falling back to mock data.', err);
-        if (!isMounted) return;
-        setError('Using mock menu until the API is available.');
-        setMenuData(mockMenuData);
-        setActiveCategory(mockMenuData.categories[0]?.name ?? null);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to load menu:', err);
+          // Only use mock data in development
+          if (!isMounted) return;
+          setError('Using mock menu until the API is available.');
+          setMenuData(mockMenuData);
+          setActiveCategory(mockMenuData.categories[0]?.name ?? null);
+        } else {
+          if (!isMounted) return;
+          setError('Unable to load menu. Please try again later.');
+        }
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -208,10 +215,13 @@ export default function RestaurantMenuPage() {
           {/* Banner Image */}
           <div className="relative w-full h-48 rounded-2xl mb-6 overflow-hidden">
             {restaurant.banner_image_url ? (
-              <img
+              <Image
                 src={restaurant.banner_image_url}
-                alt={restaurant.name}
-                className="w-full h-full object-cover"
+                alt={`Banner image for ${restaurant.name}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                priority
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-[#D32F2F] to-red-600 flex items-center justify-center">

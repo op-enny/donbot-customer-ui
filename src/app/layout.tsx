@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { OrderStatusWatcher } from "@/components/layout/OrderStatusWatcher";
+import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <OrderStatusWatcher />
-        <Header />
-        <main className="pb-24">
-          {children}
-        </main>
-        <BottomNav />
+        <ConfirmDialogProvider>
+          <OrderStatusWatcher />
+          <Header />
+          <main className="pb-24">
+            {children}
+          </main>
+          <BottomNav />
+        </ConfirmDialogProvider>
       </body>
     </html>
   );

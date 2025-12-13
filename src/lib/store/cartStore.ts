@@ -13,19 +13,38 @@ export interface CartItem {
   image_url: string | null;
 }
 
+interface CartConflict {
+  hasConflict: boolean;
+  currentRestaurantName: string | null;
+}
+
+interface RestaurantInfo {
+  restaurantId: string;
+  restaurantName: string;
+  restaurantSlug: string;
+  deliveryFee?: number;
+  minimumOrder?: number;
+}
+
 interface CartStore {
   items: CartItem[];
   restaurantId: string | null;
   restaurantName: string | null;
   restaurantSlug: string | null;
+  deliveryFee: number;
+  minimumOrder: number;
 
   // Actions
-  addItem: (item: Omit<CartItem, 'id'>, restaurantId: string, restaurantName: string, restaurantSlug: string) => void;
+  checkRestaurantConflict: (restaurantId: string) => CartConflict;
+  addItem: (item: Omit<CartItem, 'id'>, restaurantInfo: RestaurantInfo) => void;
+  addItemAfterClear: (item: Omit<CartItem, 'id'>, restaurantInfo: RestaurantInfo) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  getDeliveryFee: () => number;
+  getMinimumOrder: () => number;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -36,16 +55,25 @@ export const useCartStore = create<CartStore>()(
       restaurantName: null,
       restaurantSlug: null,
 
+      // Check if adding from a different restaurant would conflict
+      checkRestaurantConflict: (restaurantId: string): CartConflict => {
+        const currentRestaurantId = get().restaurantId;
+        if (currentRestaurantId && currentRestaurantId !== restaurantId) {
+          return {
+            hasConflict: true,
+            currentRestaurantName: get().restaurantName,
+          };
+        }
+        return { hasConflict: false, currentRestaurantName: null };
+      },
+
       addItem: (item, restaurantId, restaurantName, restaurantSlug) => {
         const currentRestaurantId = get().restaurantId;
 
-        // If cart has items from a different restaurant, ask to clear
+        // If cart has items from a different restaurant, do nothing
+        // The component should handle conflict with confirm dialog first
         if (currentRestaurantId && currentRestaurantId !== restaurantId) {
-          const shouldClear = confirm(
-            `Your cart contains items from ${get().restaurantName}. Clear cart and add items from ${restaurantName}?`
-          );
-          if (!shouldClear) return;
-          set({ items: [], restaurantId, restaurantName, restaurantSlug });
+          return;
         }
 
         // Generate unique ID for cart item
@@ -63,6 +91,18 @@ export const useCartStore = create<CartStore>()(
           restaurantName,
           restaurantSlug,
         }));
+      },
+
+      // Add item after clearing cart (used when user confirms clearing)
+      addItemAfterClear: (item, restaurantId, restaurantName, restaurantSlug) => {
+        // Clear cart and add new item
+        const cartItemId = `${item.menuItemId}-${Date.now()}-${Math.random()}`;
+        set({
+          items: [{ ...item, id: cartItemId }],
+          restaurantId,
+          restaurantName,
+          restaurantSlug,
+        });
       },
 
       removeItem: (itemId) => {

@@ -5,6 +5,7 @@ import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useLocaleStore } from '@/lib/store/localeStore';
+import { useConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface Modifier {
   id: string;
@@ -51,11 +52,14 @@ export function ItemModal({
   onClose,
 }: ItemModalProps) {
   const { t } = useLocaleStore();
+  const { confirm } = useConfirmDialog();
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
   const [specialInstructions, setSpecialInstructions] = useState('');
 
   const addItem = useCartStore((state) => state.addItem);
+  const addItemAfterClear = useCartStore((state) => state.addItemAfterClear);
+  const checkRestaurantConflict = useCartStore((state) => state.checkRestaurantConflict);
   const modifierGroups = item.modifier_groups || [];
 
   if (!isOpen) return null;
@@ -92,7 +96,7 @@ export function ItemModal({
     return total;
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     // Prepare human-readable modifiers
     const selectedModifiers = modifierGroups
       .map((group) => {
@@ -108,26 +112,41 @@ export function ItemModal({
           options: names,
         };
       })
-      .filter((item): item is { groupName: string; options: string[] } => item !== null);
+      .filter((cartItem): cartItem is { groupName: string; options: string[] } => cartItem !== null);
 
-    // Add item to cart using Zustand store
-    addItem(
-      {
-        menuItemId: item.id,
-        name: item.name,
-        price: calculateTotalPrice() / quantity, // Price per item (including extras)
-        quantity,
-        options: selectedOptions,
-        selectedModifiers,
-        specialInstructions: specialInstructions || undefined,
-        image_url: item.image_url,
-      },
-      restaurantId,
-      restaurantName,
-      restaurantSlug
-    );
+    const cartItem = {
+      menuItemId: item.id,
+      name: item.name,
+      price: calculateTotalPrice() / quantity, // Price per item (including extras)
+      quantity,
+      options: selectedOptions,
+      selectedModifiers,
+      specialInstructions: specialInstructions || undefined,
+      image_url: item.image_url,
+    };
 
-    // Close modal
+    // Check for restaurant conflict
+    const conflict = checkRestaurantConflict(restaurantId);
+
+    if (conflict.hasConflict) {
+      // Show accessible confirmation dialog instead of browser confirm
+      const shouldClear = await confirm({
+        title: 'Clear your cart?',
+        message: `Your cart contains items from ${conflict.currentRestaurantName}. Would you like to clear your cart and add items from ${restaurantName}?`,
+        confirmText: 'Clear & Add',
+        cancelText: 'Keep Cart',
+        variant: 'destructive',
+      });
+
+      if (shouldClear) {
+        addItemAfterClear(cartItem, restaurantId, restaurantName, restaurantSlug);
+        onClose();
+      }
+      return;
+    }
+
+    // No conflict, add item normally
+    addItem(cartItem, restaurantId, restaurantName, restaurantSlug);
     onClose();
   };
 

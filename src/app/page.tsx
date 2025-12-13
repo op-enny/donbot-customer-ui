@@ -92,7 +92,6 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('Fetching restaurants with params:', { lat, lng, radius, term });
       const data = await restaurantsApi.getNearbyRestaurants(
         lat,
         lng,
@@ -103,11 +102,12 @@ export default function Home() {
       if (data && data.length > 0) {
         setRestaurants(data);
       } else {
-        console.log('No restaurants found from API');
         setRestaurants([]); // Clear list if nothing found
       }
     } catch (err) {
-      console.error('Failed to load restaurants:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to load restaurants:', err);
+      }
       setError('Failed to load restaurants. Please try again.');
       setRestaurants([]);
     } finally {

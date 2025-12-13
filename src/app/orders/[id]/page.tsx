@@ -6,13 +6,23 @@ import Link from 'next/link';
 import { ordersApi, type Order } from '@/lib/api';
 import { ArrowLeft, CheckCircle, Clock, AlertCircle, Package } from 'lucide-react';
 import { useLocaleStore } from '@/lib/store/localeStore';
+import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 
 export default function OrderTrackingPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const orderIdParam = params.id;
   const orderId = Array.isArray(orderIdParam) ? orderIdParam[0] : (orderIdParam as string);
-  const token = searchParams.get('token');
+
+  // Try to get token from multiple sources (prioritized):
+  // 1. URL search params (for backwards compatibility/shared links)
+  // 2. sessionStorage (for secure same-session access)
+  // 3. orderHistoryStore (for returning users)
+  const urlToken = searchParams.get('token');
+  const { orders: historyOrders } = useOrderHistoryStore();
+  const historyOrder = historyOrders.find((o) => o.id === orderId);
+
+  const [token, setToken] = useState<string | null>(null);
   const t = useLocaleStore((state) => state.t);
   const currencySymbol = useLocaleStore((state) => state.currencySymbol);
 
@@ -20,7 +30,23 @@ export default function OrderTrackingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Resolve token on mount (client-side only)
   useEffect(() => {
+    const resolvedToken =
+      urlToken ||
+      (typeof window !== 'undefined' ? sessionStorage.getItem(`order_token_${orderId}`) : null) ||
+      historyOrder?.trackingToken ||
+      null;
+    setToken(resolvedToken);
+  }, [orderId, urlToken, historyOrder?.trackingToken]);
+
+  useEffect(() => {
+    // Wait for token resolution
+    if (token === null && !urlToken && !historyOrder?.trackingToken) {
+      // Still checking sessionStorage
+      return;
+    }
+
     let isMounted = true;
 
     if (!token) {
@@ -35,7 +61,9 @@ export default function OrderTrackingPage() {
         if (!isMounted) return;
         setOrder(data);
       } catch (err) {
-        console.error('Failed to track order', err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to track order', err);
+        }
         if (!isMounted) return;
         setError(t('unable_to_load_order'));
       } finally {
@@ -48,7 +76,7 @@ export default function OrderTrackingPage() {
     return () => {
       isMounted = false;
     };
-  }, [orderId, token, t]);
+  }, [orderId, token, t, urlToken, historyOrder?.trackingToken]);
 
   // Helper to get translated status
   const getStatusLabel = (status: string) => {

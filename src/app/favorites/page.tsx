@@ -2,6 +2,7 @@
 
 import { Heart, Clock, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function FavoritesPage() {
   // Mock data - will be replaced with actual favorites from localStorage
@@ -56,12 +57,14 @@ export default function FavoritesPage() {
                 className="block bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="flex gap-4 p-4">
-                  <div className="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 overflow-hidden">
+                  <div className="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 overflow-hidden relative">
                     {restaurant.imageUrl ? (
-                      <img
+                      <Image
                         src={restaurant.imageUrl}
-                        alt={restaurant.name}
-                        className="w-full h-full object-cover"
+                        alt={`Logo of ${restaurant.name}`}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-3xl">
