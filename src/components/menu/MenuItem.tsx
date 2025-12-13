@@ -24,7 +24,7 @@ interface MenuItemProps {
   minimumOrder?: number;
 }
 
-export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }: MenuItemProps) {
+export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, deliveryFee, minimumOrder }: MenuItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Check availability (support both fields for compatibility)
@@ -93,6 +93,8 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug }:
           restaurantId={restaurantId}
           restaurantName={restaurantName}
           restaurantSlug={restaurantSlug}
+          deliveryFee={deliveryFee}
+          minimumOrder={minimumOrder}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />

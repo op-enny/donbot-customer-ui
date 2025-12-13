@@ -9,13 +9,15 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 
 export default function CartPage() {
   const [mounted, setMounted] = useState(false);
-  const { items, restaurantName, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
+  const { items, restaurantName, updateQuantity, removeItem, clearCart, getTotalPrice, getDeliveryFee, getMinimumOrder } = useCartStore();
   const { locale } = useLocaleStore();
   const t = translations[locale];
 
   const totalPrice = getTotalPrice();
-  const deliveryFee = 2.5; // TODO: Get from restaurant settings
+  const deliveryFee = getDeliveryFee();
+  const minimumOrder = getMinimumOrder();
   const grandTotal = totalPrice + deliveryFee;
+  const isBelowMinimum = totalPrice < minimumOrder;
 
   // Wait for client-side hydration to avoid SSR mismatch
   useEffect(() => {
@@ -211,13 +213,32 @@ export default function CartPage() {
             </div>
           </div>
 
+          {/* Minimum Order Warning */}
+          {isBelowMinimum && minimumOrder > 0 && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+              <p className="text-sm text-yellow-800">
+                Minimum order amount is <span className="font-bold">{minimumOrder.toFixed(2)}</span>.
+                Add <span className="font-bold">{(minimumOrder - totalPrice).toFixed(2)}</span> more to checkout.
+              </p>
+            </div>
+          )}
+
           {/* Checkout Button */}
-          <Link
-            href="/checkout"
-            className="block w-full bg-[#D32F2F] hover:bg-red-700 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
-          >
-            {t['checkout']}
-          </Link>
+          {isBelowMinimum && minimumOrder > 0 ? (
+            <button
+              disabled
+              className="block w-full bg-gray-300 text-gray-500 font-bold text-center py-4 rounded-full cursor-not-allowed"
+            >
+              Add more items ({(minimumOrder - totalPrice).toFixed(2)} to go)
+            </button>
+          ) : (
+            <Link
+              href="/checkout"
+              className="block w-full bg-[#D32F2F] hover:bg-red-700 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
+            >
+              {t['checkout']}
+            </Link>
+          )}
 
           {/* Continue Shopping */}
           <Link

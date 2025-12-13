@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { Clock, Star, MapPin, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { MenuItem } from '@/components/menu/MenuItem';
+import { RestaurantHeaderSkeleton, MenuItemSkeleton } from '@/components/ui/skeleton';
 import { restaurantsApi, type MenuWithCategories } from '@/lib/api';
 import { useLocaleStore } from '@/lib/store/localeStore';
 
@@ -184,14 +185,18 @@ export default function RestaurantMenuPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="h-48 rounded-2xl bg-gray-100 animate-pulse mb-6" />
-        <div className="h-6 w-48 bg-gray-100 animate-pulse rounded mb-2" />
-        <div className="h-4 w-32 bg-gray-100 animate-pulse rounded mb-8" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="h-48 rounded-2xl bg-gray-100 animate-pulse" />
-          ))}
+      <div className="min-h-screen pb-8">
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="container mx-auto px-4 py-6">
+            <RestaurantHeaderSkeleton />
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <MenuItemSkeleton key={idx} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -346,6 +351,8 @@ export default function RestaurantMenuPage() {
                     restaurantId={restaurant.id}
                     restaurantName={restaurant.name}
                     restaurantSlug={restaurant.slug}
+                    deliveryFee={restaurant.delivery_fee}
+                    minimumOrder={restaurant.minimum_order}
                   />
                 ))}
               </div>

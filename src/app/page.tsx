@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { HeroBanner } from '@/components/layout/HeroBanner';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
+import { RestaurantCardSkeleton } from '@/components/ui/skeleton';
 import { restaurantsApi, type Restaurant } from '@/lib/api';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { useLocaleStore, translations } from '@/lib/store/localeStore';
@@ -192,11 +193,8 @@ export default function Home() {
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="h-48 rounded-2xl bg-gray-100 animate-pulse"
-              />
+            {Array.from({ length: 8 }).map((_, idx) => (
+              <RestaurantCardSkeleton key={idx} />
             ))}
           </div>
         ) : (
