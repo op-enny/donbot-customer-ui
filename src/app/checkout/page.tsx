@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { useLocaleStore, translations } from '@/lib/store/localeStore';
-import { ordersApi } from '@/lib/api';
+import { ordersApi, RateLimitError } from '@/lib/api';
+import { saveSecureUserInfo, loadSecureUserInfo } from '@/lib/utils/crypto';
+import { sanitizeText, sanitizeEmail, sanitizeNotes } from '@/lib/utils/sanitize';
 import { ArrowLeft, CreditCard, Wallet, Smartphone, MapPin, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,6 +16,12 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { items, restaurantId, restaurantName, restaurantSlug, getTotalPrice, clearCart } = useCartStore();
+
+  // Generate idempotency key once per page load to prevent duplicate submissions
+  const idempotencyKeyRef = useRef<string | null>(null);
+  if (!idempotencyKeyRef.current && typeof crypto !== 'undefined') {
+    idempotencyKeyRef.current = crypto.randomUUID();
+  }
   const { locale } = useLocaleStore();
   const t = translations[locale];
 
@@ -49,46 +57,44 @@ export default function CheckoutPage() {
     }
   }, [mounted, items.length, router]);
 
-  // Load user info from local storage
+  // Load user info from encrypted local storage
   useEffect(() => {
     if (!mounted) return;
 
-    const storedData = localStorage.getItem('donbot_user_info');
-    let initialAddress = '';
-
-    if (storedData) {
+    const loadUserData = async () => {
       try {
-        const parsedData = JSON.parse(storedData);
-        const now = Date.now();
-        const fifteenDays = 15 * 24 * 60 * 60 * 1000;
+        const secureData = await loadSecureUserInfo();
+        let initialAddress = '';
 
-        if (now - parsedData.timestamp < fifteenDays) {
+        if (secureData) {
           setFormData((prev) => ({
             ...prev,
-            customerName: parsedData.customerName || '',
-            customerPhone: parsedData.customerPhone || '',
-            customerEmail: parsedData.customerEmail || '',
-            deliveryAddress: parsedData.deliveryAddress || '',
+            customerName: secureData.customerName || '',
+            customerPhone: secureData.customerPhone || '',
+            customerEmail: secureData.customerEmail || '',
+            deliveryAddress: secureData.deliveryAddress || '',
           }));
-          initialAddress = parsedData.deliveryAddress || '';
-        } else {
-          localStorage.removeItem('donbot_user_info');
+          initialAddress = secureData.deliveryAddress || '';
         }
-      } catch (e) {
-        console.error('Failed to parse user info', e);
-      }
-    }
 
-    // If no address from user info, try location store
-    if (!initialAddress) {
-      const locationStore = useLocationStore.getState();
-      if (locationStore.isSet && locationStore.address) {
-        setFormData((prev) => ({
-          ...prev,
-          deliveryAddress: locationStore.address,
-        }));
+        // If no address from user info, try location store
+        if (!initialAddress) {
+          const locationStore = useLocationStore.getState();
+          if (locationStore.isSet && locationStore.address) {
+            setFormData((prev) => ({
+              ...prev,
+              deliveryAddress: locationStore.address,
+            }));
+          }
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to load user info:', error);
+        }
       }
-    }
+    };
+
+    loadUserData();
   }, [mounted]);
 
   // Show loading during hydration
@@ -122,14 +128,6 @@ export default function CheckoutPage() {
     return germanPhoneRegex.test(cleaned);
   };
 
-  // Sanitize text input to prevent XSS and limit length
-  const sanitizeInput = (input: string, maxLength: number = 500): string => {
-    return input
-      .trim()
-      .slice(0, maxLength)
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/[<>]/g, ''); // Remove remaining angle brackets
-  };
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -202,41 +200,39 @@ export default function CheckoutPage() {
         special_instructions: item.specialInstructions,
       }));
 
-      // Generate idempotency key
-      const idempotencyKey = `${Date.now()}-${Math.random()}`;
+      // Use pre-generated idempotency key (UUID)
+      const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
 
       const targetSlug = restaurantSlug || 'limon-grillhaus';
 
       // Format phone number for German validation
       const formattedPhone = formatPhoneNumber(formData.customerPhone);
 
-      // Submit order to backend with sanitized inputs
+      // Submit order to backend with sanitized inputs (using DOMPurify)
       const order = await ordersApi.createOrder(targetSlug, {
-        customer_name: sanitizeInput(formData.customerName, 100),
+        customer_name: sanitizeText(formData.customerName, 100),
         customer_phone: formattedPhone,
-        customer_email: formData.customerEmail ? sanitizeInput(formData.customerEmail, 255) : undefined,
+        customer_email: formData.customerEmail ? sanitizeEmail(formData.customerEmail) : undefined,
         delivery_method: formData.deliveryMethod,
-        delivery_address: formData.deliveryMethod === 'delivery' ? sanitizeInput(formData.deliveryAddress, 500) : undefined,
+        delivery_address: formData.deliveryMethod === 'delivery' ? sanitizeText(formData.deliveryAddress, 500) : undefined,
         payment_method: formData.paymentMethod,
         items: orderItems.map((item) => ({
           ...item,
           special_instructions: item.special_instructions
-            ? sanitizeInput(item.special_instructions, 500)
+            ? sanitizeNotes(item.special_instructions, 500)
             : undefined,
         })),
-        notes: formData.notes ? sanitizeInput(formData.notes, 500) : undefined,
+        notes: formData.notes ? sanitizeNotes(formData.notes, 500) : undefined,
         idempotency_key: idempotencyKey,
       });
 
-      // Save user info to local storage (15 days validity)
-      const userInfo = {
+      // Save user info securely with encryption (7-day retention)
+      await saveSecureUserInfo({
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
-        customerEmail: formData.customerEmail,
-        deliveryAddress: formData.deliveryAddress,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem('donbot_user_info', JSON.stringify(userInfo));
+        customerEmail: formData.customerEmail || undefined,
+        deliveryAddress: formData.deliveryAddress || undefined,
+      });
 
       // Save to order history
       useOrderHistoryStore.getState().addOrder({
@@ -263,7 +259,14 @@ export default function CheckoutPage() {
       if (process.env.NODE_ENV === 'development') {
         console.error('Order submission error:', err);
       }
-      setError(err.response?.data?.message || 'Failed to place order. Please try again.');
+
+      // Handle rate limit error with user-friendly message
+      if (err instanceof RateLimitError) {
+        const secondsRemaining = Math.ceil(err.retryAfterMs / 1000);
+        setError(`${err.message} (${secondsRemaining} seconds)`);
+      } else {
+        setError(err.response?.data?.message || 'Failed to place order. Please try again.');
+      }
       setIsSubmitting(false);
     }
   };

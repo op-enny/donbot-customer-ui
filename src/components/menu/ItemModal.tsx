@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useLocaleStore } from '@/lib/store/localeStore';
 import { useConfirmDialog } from '@/components/ui/confirm-dialog';
+import { sanitizeNotes } from '@/lib/utils/sanitize';
 
 interface Modifier {
   id: string;
@@ -252,11 +253,25 @@ export function ItemModal({
             <h4 className="text-base font-semibold text-gray-900 mb-3">{t('special_instructions')}</h4>
             <textarea
               value={specialInstructions}
-              onChange={(e) => setSpecialInstructions(e.target.value)}
+              onChange={(e) => {
+                // Limit input and sanitize on change
+                const value = e.target.value.slice(0, 500);
+                setSpecialInstructions(value);
+              }}
+              onBlur={(e) => {
+                // Sanitize on blur for final cleanup
+                setSpecialInstructions(sanitizeNotes(e.target.value, 500));
+              }}
               placeholder={t('placeholder_notes')}
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#D32F2F] focus:outline-none resize-none"
               rows={3}
+              maxLength={500}
+              aria-label={t('special_instructions')}
+              aria-describedby="special-instructions-hint"
             />
+            <p id="special-instructions-hint" className="text-xs text-gray-500 mt-1 text-right">
+              {specialInstructions.length}/500
+            </p>
           </div>
         </div>
 

@@ -124,7 +124,13 @@ export default function OrdersPage() {
             {orders.map((order) => (
               <Link
                 key={order.id}
-                href={`/orders/${order.id}?token=${order.trackingToken}`}
+                href={`/orders/${order.id}`}
+                onClick={() => {
+                  // Store token in sessionStorage before navigation (more secure than URL)
+                  if (order.trackingToken) {
+                    sessionStorage.setItem(`order_token_${order.id}`, order.trackingToken);
+                  }
+                }}
                 className="block bg-white rounded-2xl shadow-md p-4 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start justify-between mb-3">

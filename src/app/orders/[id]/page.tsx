@@ -60,6 +60,12 @@ export default function OrderTrackingPage() {
         const data = await ordersApi.trackOrder(orderId, token);
         if (!isMounted) return;
         setOrder(data);
+
+        // Clear sessionStorage token after successful fetch (security best practice)
+        // This reduces the window of token exposure
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem(`order_token_${orderId}`);
+        }
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to track order', err);
