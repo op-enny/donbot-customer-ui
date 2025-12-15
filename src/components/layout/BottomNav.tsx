@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Home, ShoppingCart, Heart, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -10,10 +11,18 @@ export function BottomNav() {
   const pathname = usePathname();
   const { t } = useLocaleStore();
   const cartItemCount = useCartStore((state) => state.getTotalItems());
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use 0 for SSR, actual count after hydration
+  const displayBadge = mounted ? cartItemCount : 0;
 
   const navItems = [
     { icon: Home, label: t('home'), href: '/' },
-    { icon: ShoppingCart, label: t('cart'), href: '/cart', badge: cartItemCount },
+    { icon: ShoppingCart, label: t('cart'), href: '/cart', badge: displayBadge },
     { icon: Heart, label: t('favorites'), href: '/favorites' },
     { icon: User, label: t('profile'), href: '/profile' },
   ];

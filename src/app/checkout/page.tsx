@@ -9,7 +9,7 @@ import { useLocaleStore, translations } from '@/lib/store/localeStore';
 import { ordersApi, RateLimitError } from '@/lib/api';
 import { saveSecureUserInfo, loadSecureUserInfo } from '@/lib/utils/crypto';
 import { sanitizeText, sanitizeEmail, sanitizeNotes } from '@/lib/utils/sanitize';
-import { ArrowLeft, CreditCard, Wallet, Smartphone, MapPin, User, Phone, Mail, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CreditCard, Wallet, Smartphone, MapPin, User, Phone, Mail, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -40,6 +40,7 @@ export default function CheckoutPage() {
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const totalPrice = getTotalPrice();
   const deliveryFee = formData.deliveryMethod === 'delivery' ? 2.5 : 0;
@@ -157,6 +158,11 @@ export default function CheckoutPage() {
     // Validate notes length
     if (formData.notes && formData.notes.length > 500) {
       errors.notes = 'Notes must be less than 500 characters';
+    }
+
+    // Validate terms acceptance
+    if (!acceptedTerms) {
+      errors.terms = t['accept_terms'] || 'You must accept the terms and conditions';
     }
 
     setFormErrors(errors);
@@ -556,7 +562,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-gray-700">
                   <span>{t['delivery_fee']}</span>
                   <span className="font-medium">
-                    {deliveryFee > 0 ? `€${deliveryFee.toFixed(2)}` : 'Free'}
+                    {deliveryFee > 0 ? `€${deliveryFee.toFixed(2)}` : t['free']}
                   </span>
                 </div>
 
@@ -568,17 +574,84 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* Legal Notice - BGB §312g */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 text-sm mb-2">
+                      {t['order_info_title']}
+                    </h3>
+                    <p className="text-xs text-blue-800 mb-2">
+                      {t['no_cancellation_notice']}
+                    </p>
+                    <p className="text-xs text-blue-700">
+                      {t['no_cancel_after_confirm']}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms Checkbox */}
+              <div className="mb-4">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative mt-0.5">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => {
+                        setAcceptedTerms(e.target.checked);
+                        if (formErrors.terms) {
+                          setFormErrors((prev) => ({ ...prev, terms: '' }));
+                        }
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className={`w-5 h-5 border-2 rounded transition-all flex items-center justify-center ${
+                      acceptedTerms
+                        ? 'bg-[#D32F2F] border-[#D32F2F]'
+                        : formErrors.terms
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-300 group-hover:border-gray-400'
+                    }`}>
+                      {acceptedTerms && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                    </div>
+                  </div>
+                  <span className={`text-sm ${formErrors.terms ? 'text-red-600' : 'text-gray-700'}`}>
+                    {t['accept_terms']} <span className="text-red-600">*</span>
+                  </span>
+                </label>
+                {formErrors.terms && (
+                  <p className="text-xs text-red-600 mt-1 ml-8">{formErrors.terms}</p>
+                )}
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full bg-[#D32F2F] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full transition-colors shadow-lg"
+                disabled={isSubmitting || !acceptedTerms}
+                className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 ${
+                  isSubmitting || !acceptedTerms
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-[#D32F2F] hover:bg-red-700 text-white'
+                }`}
               >
-                {isSubmitting ? 'Placing Order...' : `${t['place_order']} - €${grandTotal.toFixed(2)}`}
+                <CreditCard className="w-5 h-5" />
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {t['place_order']}...
+                  </span>
+                ) : (
+                  <span>{t['place_order_binding']} - €{grandTotal.toFixed(2)}</span>
+                )}
               </button>
 
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By placing this order, you agree to our terms and conditions
+              <p className="text-xs text-gray-500 text-center mt-3">
+                <Link href="/agb" className="text-[#D32F2F] hover:underline">{t['terms_of_service']}</Link>
+                {' • '}
+                <Link href="/datenschutz" className="text-[#D32F2F] hover:underline">{t['privacy_policy']}</Link>
               </p>
             </div>
           </div>

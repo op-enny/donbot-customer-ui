@@ -160,17 +160,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  /* Custom font imports - matching food delivery design */
-  @font-face {
-    font-family: 'Lobster';
-    src: url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-  }
 }
 
 @layer components {

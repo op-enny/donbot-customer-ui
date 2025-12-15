@@ -160,6 +160,18 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Datenschutzerklärung',
     'contact_support': 'Support kontaktieren',
     'sign_out': 'Abmelden',
+
+    // Legal / Checkout
+    'order_info_title': 'Bestellhinweis',
+    'no_cancellation_notice': 'Für zubereitete Speisen besteht gemäß BGB §312g Abs. 2 Nr. 9 kein Widerrufsrecht.',
+    'no_cancel_after_confirm': 'Nach Bestätigung kann die Bestellung nicht mehr storniert werden.',
+    'accept_terms': 'Ich akzeptiere die AGB und Datenschutzerklärung.',
+    'place_order_binding': 'Zahlungspflichtig bestellen',
+    'contact_info': 'Kontaktinformationen',
+    'all': 'Alle',
+    'search_results': 'Ergebnisse für',
+    'no_results': 'Keine Ergebnisse gefunden',
+    'clear': 'Löschen',
   },
   en: {
     // Header & Navigation
@@ -305,6 +317,18 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Privacy Policy',
     'contact_support': 'Contact Support',
     'sign_out': 'Sign Out',
+
+    // Legal / Checkout
+    'order_info_title': 'Order Information',
+    'no_cancellation_notice': 'For prepared food orders, there is no right of withdrawal according to BGB §312g Para. 2 No. 9.',
+    'no_cancel_after_confirm': 'Your order cannot be cancelled after confirmation.',
+    'accept_terms': 'I accept the Terms of Service and Privacy Policy.',
+    'place_order_binding': 'Place Binding Order',
+    'contact_info': 'Contact Information',
+    'all': 'All',
+    'search_results': 'results for',
+    'no_results': 'No results found',
+    'clear': 'Clear',
   },
   tr: {
     // Header & Navigation
@@ -450,6 +474,18 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Gizlilik Politikası',
     'contact_support': 'Destek İletişim',
     'sign_out': 'Çıkış Yap',
+
+    // Legal / Checkout
+    'order_info_title': 'Sipariş Bilgilendirmesi',
+    'no_cancellation_notice': 'Hazırlanmış yemek siparişleri için yasal düzenlemeler gereği cayma hakkı bulunmamaktadır.',
+    'no_cancel_after_confirm': 'Siparişiniz onaylandıktan sonra iptal edilemez.',
+    'accept_terms': 'Kullanım Koşulları ve Gizlilik Politikası\'nı kabul ediyorum.',
+    'place_order_binding': 'Ödeme yükümlü sipariş ver',
+    'contact_info': 'İletişim Bilgileri',
+    'all': 'Tümü',
+    'search_results': 'için sonuçlar',
+    'no_results': 'Sonuç bulunamadı',
+    'clear': 'Temizle',
   },
 };
 

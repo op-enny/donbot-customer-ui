@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Plus } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { ItemModal } from './ItemModal';
 
 interface MenuItemProps {
@@ -16,6 +16,7 @@ interface MenuItemProps {
     is_available?: boolean;
     is_active?: boolean;
     is_popular?: boolean;
+    rating?: number;
   };
   restaurantId: string;
   restaurantName: string;
@@ -36,50 +37,69 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
     <>
       <div
         onClick={() => setIsModalOpen(true)}
-        className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all cursor-pointer group border border-gray-100"
+        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group border border-gray-100 active:scale-[0.98]"
       >
-        {/* Item Image */}
-        <div className="relative w-full aspect-[4/3] bg-gray-100">
+        {/* Item Image - Mobilde daha kompakt */}
+        <div className="relative w-full aspect-square sm:aspect-[4/3] bg-gray-50">
           {item.image_url ? (
             <Image
               src={item.image_url}
               alt={item.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              <span className="text-5xl">🍽️</span>
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+              <span className="text-4xl sm:text-5xl opacity-60">🍽️</span>
             </div>
           )}
 
-          {/* Popular Badge */}
+          {/* Popular Badge - Mobilde daha küçük */}
           {item.is_popular && (
-            <div className="absolute top-3 left-3 bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-              🔥 Popular
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
+              <span className="hidden sm:inline">🔥</span>
+              <span>Popular</span>
             </div>
           )}
 
-          {/* Add Button */}
-          <div className="absolute bottom-3 right-3 bg-[#D32F2F] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-            <Plus className="w-5 h-5" />
-          </div>
+          {/* Add Button - Her zaman görünür */}
+          <button
+            className="absolute bottom-2 right-2 bg-[#D32F2F] text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 active:scale-95 transition-transform"
+            aria-label={`${item.name} sepete ekle`}
+          >
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
         </div>
 
-        {/* Item Info */}
-        <div className="p-4">
-          <h3 className="font-semibold text-base text-gray-900 mb-1 line-clamp-1 group-hover:text-[#D32F2F] transition-colors">
+        {/* Item Info - Mobilde daha kompakt */}
+        <div className="p-2.5 sm:p-4">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1 line-clamp-2 group-hover:text-[#D32F2F] transition-colors leading-tight">
             {item.name}
           </h3>
 
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+          {/* Açıklama - Sadece tablet ve üstünde */}
+          <p className="hidden sm:block text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">
             {item.description || 'Keine Beschreibung verfügbar'}
           </p>
 
-          {/* Price */}
-          <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-[#D32F2F]">
+          {/* Alt bilgi - Fiyat ve Rating */}
+          <div className="flex items-center justify-between mt-1.5 sm:mt-2">
+            {/* Rating (varsa) veya kategori etiketi */}
+            {item.rating ? (
+              <div className="flex items-center gap-1 text-gray-500">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs sm:text-sm font-medium">{item.rating.toFixed(1)}</span>
+              </div>
+            ) : (
+              <span className="text-[10px] sm:text-xs text-gray-400 truncate max-w-[60px] sm:max-w-none">
+                {item.category}
+              </span>
+            )}
+
+            {/* Fiyat */}
+            <span className="text-sm sm:text-lg font-bold text-[#D32F2F]">
               €{item.price.toFixed(2)}
             </span>
           </div>

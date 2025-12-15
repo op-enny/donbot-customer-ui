@@ -35,6 +35,7 @@ export function Header() {
                 src="/donbot-logo.png"
                 alt="DonBot"
                 fill
+                sizes="128px"
                 className="object-contain object-left"
                 priority
               />

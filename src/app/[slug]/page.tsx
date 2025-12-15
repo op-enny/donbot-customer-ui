@@ -1,13 +1,46 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { Clock, Star, MapPin, Phone } from 'lucide-react';
+import { Clock, Star, MapPin, Phone, Search, SlidersHorizontal } from 'lucide-react';
 import Image from 'next/image';
 import { MenuItem } from '@/components/menu/MenuItem';
 import { RestaurantHeaderSkeleton, MenuItemSkeleton } from '@/components/ui/skeleton';
 import { restaurantsApi, type MenuWithCategories } from '@/lib/api';
 import { useLocaleStore } from '@/lib/store/localeStore';
+
+// Kategori emoji mapping
+const categoryEmojis: Record<string, string> = {
+  'Döner & Dürüm': '🥙',
+  'Döner': '🥙',
+  'Dürüm': '🌯',
+  'Pizza': '🍕',
+  'Burger': '🍔',
+  'Pasta': '🍝',
+  'Salate': '🥗',
+  'Salat': '🥗',
+  'Getränke': '🥤',
+  'Desserts': '🍰',
+  'Dessert': '🍰',
+  'Vorspeisen': '🥟',
+  'Suppen': '🍜',
+  'Fleisch': '🥩',
+  'Fisch': '🐟',
+  'Vegetarisch': '🥬',
+  'Vegan': '🌱',
+  'Kinder': '👶',
+  'Frühstück': '🍳',
+  'Kebab': '🍢',
+  'Lahmacun': '🫓',
+  'Pide': '🫓',
+  'Pommes': '🍟',
+  'Beilagen': '🍟',
+  'Extras': '✨',
+  'Aktionen': '🔥',
+  'Neu': '🆕',
+  'Beliebt': '⭐',
+  'Alle': '🍽️',
+};
 
 // Mock menu data - will be replaced with API call
 const mockMenuData: MenuWithCategories = {
@@ -143,6 +176,41 @@ export default function RestaurantMenuPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Kategoriye emoji getiren yardımcı fonksiyon
+  const getCategoryEmoji = (categoryName: string): string => {
+    // Exact match
+    if (categoryEmojis[categoryName]) return categoryEmojis[categoryName];
+
+    // Partial match
+    const lowerName = categoryName.toLowerCase();
+    for (const [key, emoji] of Object.entries(categoryEmojis)) {
+      if (lowerName.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerName)) {
+        return emoji;
+      }
+    }
+    return '🍽️'; // Default emoji
+  };
+
+  // Filtrelenmiş kategoriler (arama sorgusu uygulanmış)
+  const filteredCategories = useMemo(() => {
+    if (!menuData?.categories || !searchQuery.trim()) {
+      return menuData?.categories || [];
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+
+    return menuData.categories
+      .map(category => ({
+        ...category,
+        items: category.items.filter(item =>
+          item.name.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query)
+        )
+      }))
+      .filter(category => category.items.length > 0);
+  }, [menuData?.categories, searchQuery]);
 
   useEffect(() => {
     let isMounted = true;
@@ -311,10 +379,51 @@ export default function RestaurantMenuPage() {
         </div>
       </div>
 
-      {/* Category Tabs (Sticky) */}
-      <div className="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
+      {/* Search Bar (Sticky) */}
+      <div className="sticky top-[73px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 py-3 px-4">
         <div className="container mx-auto">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+          <div className="relative flex items-center gap-3">
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#D32F2F] flex items-center justify-center">
+                <Search className="w-4 h-4 text-white" />
+              </div>
+              <input
+                type="text"
+                placeholder={t('search_placeholder') || "Ne yemek istersiniz?"}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all shadow-sm"
+              />
+            </div>
+            {/* Filter Button (optional, for future use) */}
+            <button className="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors">
+              <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Tabs (Horizontal Scroll with Emoji) */}
+      <div className="sticky top-[145px] z-30 bg-white border-b border-gray-100 py-3 px-4">
+        <div className="container mx-auto">
+          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
+            {/* "Tümü" butonu */}
+            <button
+              onClick={() => {
+                setActiveCategory(null);
+                setSearchQuery('');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                activeCategory === null && !searchQuery
+                  ? 'bg-[#D32F2F] text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+              }`}
+            >
+              <span>🍽️</span>
+              <span>{t('all') || 'Tümü'}</span>
+            </button>
             {categories.map((category) => (
               <button
                 key={category.name}
@@ -322,13 +431,14 @@ export default function RestaurantMenuPage() {
                   setActiveCategory(category.name);
                   document.getElementById(category.name)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   activeCategory === category.name
                     ? 'bg-[#D32F2F] text-white shadow-md'
-                    : 'bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
                 }`}
               >
-                {category.name}
+                <span>{getCategoryEmoji(category.name)}</span>
+                <span>{category.name}</span>
               </button>
             ))}
           </div>
@@ -337,13 +447,38 @@ export default function RestaurantMenuPage() {
 
       {/* Menu Items by Category */}
       <div className="container mx-auto px-4 py-6">
-        {categories?.map((category) => (
-            <div key={category.name} id={category.name} className="mb-8 scroll-mt-32">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        {/* Arama sonuç mesajı */}
+        {searchQuery && (
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">&quot;{searchQuery}&quot;</span> {t('search_results') || 'için sonuçlar'}
+              {filteredCategories.length === 0 && (
+                <span className="block mt-1 text-gray-500">
+                  {t('no_results') || 'Sonuç bulunamadı'}
+                </span>
+              )}
+            </p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-sm text-[#D32F2F] hover:underline"
+            >
+              {t('clear') || 'Temizle'}
+            </button>
+          </div>
+        )}
+
+        {(searchQuery ? filteredCategories : categories)?.map((category) => (
+            <div key={category.name} id={category.name} className="mb-8 scroll-mt-48">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-2xl">{getCategoryEmoji(category.name)}</span>
                 {category.name}
+                <span className="text-sm font-normal text-gray-400 ml-2">
+                  ({category.items?.length || 0})
+                </span>
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* 2 kolon mobilde, 3 kolon tablette, 4 kolon desktopda */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {category.items?.map((item) => (
                   <MenuItem
                     key={item.id}

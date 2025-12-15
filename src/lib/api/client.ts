@@ -119,8 +119,8 @@ apiClient.interceptors.response.use(
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.error('API Error:', error.response?.status);
-      console.error('Error Details:', error.response?.data);
+      console.error('API Error:', error.response?.status || error.message || 'Network Error');
+      console.error('Error Details:', error.response?.data || error.code);
       console.error('Request URL:', error.config?.url);
       console.error('Request Data:', error.config?.data);
     }
