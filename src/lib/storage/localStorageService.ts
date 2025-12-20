@@ -5,6 +5,14 @@
 
 const STORAGE_PREFIX = 'donbot_';
 
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 export class LocalStorageService {
   /**
    * Get item from localStorage with automatic JSON parsing
@@ -129,14 +137,14 @@ export class LocalStorageService {
   /**
    * Export all DonBot data as JSON (for GDPR compliance)
    */
-  static exportData(): Record<string, any> {
+  static exportData(): Record<string, JsonValue> {
     if (typeof window === 'undefined') return {};
 
-    const data: Record<string, any> = {};
+    const data: Record<string, JsonValue> = {};
     const keys = this.getAllKeys();
 
     keys.forEach((key) => {
-      const value = this.get(key);
+      const value = this.get<JsonValue>(key);
       if (value !== null) {
         data[key] = value;
       }
@@ -148,7 +156,7 @@ export class LocalStorageService {
   /**
    * Import data from JSON export
    */
-  static importData(data: Record<string, any>): void {
+  static importData(data: Record<string, JsonValue>): void {
     Object.entries(data).forEach(([key, value]) => {
       this.set(key, value);
     });

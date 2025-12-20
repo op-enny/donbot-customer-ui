@@ -6,14 +6,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
-import { useLocaleStore } from '@/lib/store/localeStore';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const orders = useOrderHistoryStore((state) => state.orders);
-  const locale = useLocaleStore((state) => state.locale);
 
   const activeOrdersCount = orders.filter(
     (o) => !['delivered', 'cancelled', 'rejected', 'completed'].includes(o.status.toLowerCase())
@@ -21,7 +19,8 @@ export function Header() {
 
   // Only render cart badge after hydration to avoid SSR mismatch
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (

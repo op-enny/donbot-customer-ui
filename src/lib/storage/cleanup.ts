@@ -6,7 +6,22 @@
 import LocalStorageService from './localStorageService';
 import { customerProfileStorage } from './customerProfile';
 import { orderHistoryStorage } from './orderHistory';
-import type { StorageMetadata } from './types';
+import type { StorageMetadata, CustomerProfile, OrderHistoryEntry } from './types';
+
+/** GDPR data export structure */
+interface DataExport {
+  customer_profile: CustomerProfile | null;
+  order_history: OrderHistoryEntry[];
+  statistics: {
+    total_orders: number;
+    active_orders: number;
+    completed_orders: number;
+    total_spent: number;
+    favorite_restaurant: { name: string; count: number } | null;
+  };
+  metadata: StorageMetadata | null;
+  exported_at: string;
+}
 
 const METADATA_KEY = 'storage_metadata';
 const CLEANUP_INTERVAL_DAYS = 1; // Run cleanup daily
@@ -135,7 +150,7 @@ export const cleanupService = {
   /**
    * Export all data for GDPR compliance
    */
-  exportAllData(): Record<string, any> {
+  exportAllData(): DataExport {
     return {
       customer_profile: customerProfileStorage.getProfile(),
       order_history: orderHistoryStorage.getOrders(),

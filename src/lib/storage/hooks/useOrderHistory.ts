@@ -51,12 +51,12 @@ export function useOrderHistory() {
   // Get order by ID
   const getOrderById = useCallback((orderId: string) => {
     return orderHistoryStorage.getOrderById(orderId);
-  }, [orders]);
+  }, []);
 
   // Get order by number
   const getOrderByNumber = useCallback((orderNumber: string) => {
     return orderHistoryStorage.getOrderByNumber(orderNumber);
-  }, [orders]);
+  }, []);
 
   // Remove order
   const removeOrder = useCallback((orderId: string) => {
@@ -67,47 +67,47 @@ export function useOrderHistory() {
   // Get active orders
   const getActiveOrders = useCallback(() => {
     return orderHistoryStorage.getActiveOrders();
-  }, [orders]);
+  }, []);
 
   // Get completed orders
   const getCompletedOrders = useCallback(() => {
     return orderHistoryStorage.getCompletedOrders();
-  }, [orders]);
+  }, []);
 
   // Get orders by restaurant
   const getOrdersByRestaurant = useCallback((restaurantSlug: string) => {
     return orderHistoryStorage.getOrdersByRestaurant(restaurantSlug);
-  }, [orders]);
+  }, []);
 
   // Get recent orders
   const getRecentOrders = useCallback((days: number = 7) => {
     return orderHistoryStorage.getRecentOrders(days);
-  }, [orders]);
+  }, []);
 
   // Get trackable orders
   const getTrackableOrders = useCallback(() => {
     return orderHistoryStorage.getTrackableOrders();
-  }, [orders]);
+  }, []);
 
   // Check if tracking expired
   const isTrackingExpired = useCallback((orderId: string) => {
     return orderHistoryStorage.isTrackingExpired(orderId);
-  }, [orders]);
+  }, []);
 
   // Get grouped orders
   const getOrdersGroupedByDate = useCallback(() => {
     return orderHistoryStorage.getOrdersGroupedByDate();
-  }, [orders]);
+  }, []);
 
   // Get statistics
   const getStatistics = useCallback(() => {
     return orderHistoryStorage.getStatistics();
-  }, [orders]);
+  }, []);
 
   // Get total spent
   const getTotalSpent = useCallback(() => {
     return orderHistoryStorage.getTotalSpent();
-  }, [orders]);
+  }, []);
 
   // Clear history
   const clearHistory = useCallback(() => {

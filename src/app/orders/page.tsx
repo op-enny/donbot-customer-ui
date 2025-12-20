@@ -3,14 +3,17 @@
 import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
+import { useLocaleStore } from '@/lib/store/localeStore';
 import { useState, useEffect } from 'react';
 
 export default function OrdersPage() {
   const [mounted, setMounted] = useState(false);
   const orders = useOrderHistoryStore((state) => state.orders);
+  const { t, locale } = useLocaleStore();
 
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   if (!mounted) {
@@ -40,16 +43,8 @@ export default function OrdersPage() {
   };
 
   const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      new: 'New',
-      confirmed: 'Confirmed',
-      preparing: 'Preparing',
-      ready: 'Ready for Pickup',
-      out_for_delivery: 'Out for Delivery',
-      completed: 'Completed',
-      cancelled: 'Cancelled',
-    };
-    return labels[status] || status;
+    const statusKey = `status_${status.toLowerCase()}` as const;
+    return t(statusKey) || status;
   };
 
   const getStatusColor = (status: string) => {
@@ -77,12 +72,17 @@ export default function OrdersPage() {
     const diffMins = Math.floor(diffMs / 60000);
 
     if (diffMins < 60) {
-      return `${diffMins} min ago`;
+      return `${diffMins} ${t('minutes_ago')}`;
     } else if (diffMins < 1440) {
       const hours = Math.floor(diffMins / 60);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return `${hours} ${t('hours_ago')}`;
     } else {
-      return date.toLocaleDateString('en-US', {
+      const localeMap: Record<string, string> = {
+        de: 'de-DE',
+        en: 'en-US',
+        tr: 'tr-TR',
+      };
+      return date.toLocaleDateString(localeMap[locale] || 'en-US', {
         month: 'short',
         day: 'numeric',
         year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
@@ -95,9 +95,9 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('my_orders')}</h1>
           <p className="text-sm text-gray-600 mt-1">
-            {orders.length} {orders.length === 1 ? 'order' : 'orders'} in last 7 days
+            {orders.length} {orders.length === 1 ? t('order_singular') : t('order_plural')} {t('in_last_7_days')}
           </p>
         </div>
       </div>
@@ -107,16 +107,16 @@ export default function OrdersPage() {
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              No orders yet
+              {t('no_orders')}
             </h2>
             <p className="text-gray-600 mb-6">
-              Start ordering from your favorite restaurants
+              {t('start_ordering')}
             </p>
             <Link
               href="/"
               className="inline-block bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
-              Browse Restaurants
+              {t('browse_restaurants')}
             </Link>
           </div>
         ) : (
@@ -164,7 +164,7 @@ export default function OrdersPage() {
                 ) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <button className="w-full bg-[#D32F2F] hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors text-sm">
-                      Track Order
+                      {t('track_order')}
                     </button>
                   </div>
                 )}
@@ -172,7 +172,7 @@ export default function OrdersPage() {
                 {order.status === 'completed' && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <button className="w-full border-2 border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 font-semibold py-2 rounded-lg transition-colors text-sm">
-                      Reorder
+                      {t('reorder')}
                     </button>
                   </div>
                 )}

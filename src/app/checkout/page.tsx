@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
@@ -15,13 +15,11 @@ import Link from 'next/link';
 export default function CheckoutPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const { items, restaurantId, restaurantName, restaurantSlug, getTotalPrice, clearCart } = useCartStore();
+  const { items, restaurantName, restaurantSlug, getTotalPrice, clearCart } = useCartStore();
 
   // Generate idempotency key once per page load to prevent duplicate submissions
-  const idempotencyKeyRef = useRef<string | null>(null);
-  if (!idempotencyKeyRef.current && typeof crypto !== 'undefined') {
-    idempotencyKeyRef.current = crypto.randomUUID();
-  }
+  // crypto.randomUUID() is available in all modern browsers
+  const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
   const { locale } = useLocaleStore();
   const t = translations[locale];
 
@@ -48,7 +46,8 @@ export default function CheckoutPage() {
 
   // Wait for client-side hydration
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Redirect if cart is empty (only after mount)
@@ -104,7 +103,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-gray-600">{t['loading_checkout']}</p>
         </div>
       </div>
     );
@@ -134,30 +133,30 @@ export default function CheckoutPage() {
     const errors: Record<string, string> = {};
 
     if (!formData.customerName.trim()) {
-      errors.customerName = 'Name is required';
+      errors.customerName = t['error_name_required'];
     } else if (formData.customerName.trim().length < 2) {
-      errors.customerName = 'Name must be at least 2 characters';
+      errors.customerName = t['error_name_min'];
     } else if (formData.customerName.trim().length > 100) {
-      errors.customerName = 'Name must be less than 100 characters';
+      errors.customerName = t['error_name_max'];
     }
 
     if (!formData.customerPhone.trim()) {
-      errors.customerPhone = 'Phone number is required';
+      errors.customerPhone = t['error_phone_required'];
     } else if (!isValidGermanPhone(formData.customerPhone)) {
-      errors.customerPhone = 'Please enter a valid German phone number (e.g., +49 171 1234567)';
+      errors.customerPhone = t['error_phone_invalid'];
     }
 
     if (formData.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
-      errors.customerEmail = 'Invalid email address';
+      errors.customerEmail = t['error_email_invalid'];
     }
 
     if (formData.deliveryMethod === 'delivery' && !formData.deliveryAddress.trim()) {
-      errors.deliveryAddress = 'Delivery address is required';
+      errors.deliveryAddress = t['error_delivery_address_required'];
     }
 
     // Validate notes length
     if (formData.notes && formData.notes.length > 500) {
-      errors.notes = 'Notes must be less than 500 characters';
+      errors.notes = t['error_notes_max'];
     }
 
     // Validate terms acceptance
@@ -207,7 +206,7 @@ export default function CheckoutPage() {
       }));
 
       // Use pre-generated idempotency key (UUID)
-      const idempotencyKey = idempotencyKeyRef.current || crypto.randomUUID();
+      const orderIdempotencyKey = idempotencyKey;
 
       const targetSlug = restaurantSlug || 'limon-grillhaus';
 
@@ -229,7 +228,7 @@ export default function CheckoutPage() {
             : undefined,
         })),
         notes: formData.notes ? sanitizeNotes(formData.notes, 500) : undefined,
-        idempotency_key: idempotencyKey,
+        idempotency_key: orderIdempotencyKey,
       });
 
       // Save user info securely with encryption (7-day retention)
@@ -261,7 +260,7 @@ export default function CheckoutPage() {
 
       // Redirect to order confirmation without token in URL
       router.push(`/orders/${order.id}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Order submission error:', err);
       }
@@ -270,8 +269,12 @@ export default function CheckoutPage() {
       if (err instanceof RateLimitError) {
         const secondsRemaining = Math.ceil(err.retryAfterMs / 1000);
         setError(`${err.message} (${secondsRemaining} seconds)`);
+      } else if (err instanceof Error) {
+        // Check for axios-like error with response
+        const axiosError = err as Error & { response?: { data?: { message?: string } } };
+        setError(axiosError.response?.data?.message || err.message || 'Failed to place order. Please try again.');
       } else {
-        setError(err.response?.data?.message || 'Failed to place order. Please try again.');
+        setError('Failed to place order. Please try again.');
       }
       setIsSubmitting(false);
     }
@@ -298,7 +301,7 @@ export default function CheckoutPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{t['checkout']}</h1>
               <p className="text-sm text-gray-600">
-                from <span className="font-semibold">{restaurantName}</span>
+                {t['from_restaurant']} <span className="font-semibold">{restaurantName}</span>
               </p>
             </div>
           </div>
@@ -315,7 +318,7 @@ export default function CheckoutPage() {
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-red-900">Order Failed</h3>
+                    <h3 className="font-semibold text-red-900">{t['order_failed']}</h3>
                     <p className="text-sm text-red-700 mt-1">{error}</p>
                   </div>
                 </div>
@@ -325,7 +328,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <User className="w-5 h-5 text-[#D32F2F]" />
-                  Contact Information
+                  {t['contact_info']}
                 </h2>
 
                 <div className="space-y-4">
@@ -417,7 +420,7 @@ export default function CheckoutPage() {
                     <div className="text-center">
                       <div className="text-2xl mb-2">🏪</div>
                       <div className="font-semibold text-gray-900">{t['pickup']}</div>
-                      <div className="text-sm text-gray-600">Free</div>
+                      <div className="text-sm text-gray-600">{t['free']}</div>
                     </div>
                   </button>
 
@@ -481,7 +484,7 @@ export default function CheckoutPage() {
                     <Wallet className="w-6 h-6 text-gray-700" />
                     <div className="text-left flex-1">
                       <div className="font-semibold text-gray-900">{t['cash']}</div>
-                      <div className="text-sm text-gray-600">Pay with cash when you receive your order</div>
+                      <div className="text-sm text-gray-600">{t['pay_with_cash']}</div>
                     </div>
                   </button>
 
@@ -497,7 +500,7 @@ export default function CheckoutPage() {
                     <CreditCard className="w-6 h-6 text-gray-700" />
                     <div className="text-left flex-1">
                       <div className="font-semibold text-gray-900">{t['card']}</div>
-                      <div className="text-sm text-gray-600">Pay with card when you receive your order</div>
+                      <div className="text-sm text-gray-600">{t['pay_with_card']}</div>
                     </div>
                   </button>
 
@@ -513,8 +516,8 @@ export default function CheckoutPage() {
                   >
                     <Smartphone className="w-6 h-6 text-gray-700" />
                     <div className="text-left flex-1">
-                      <div className="font-semibold text-gray-900">Online Payment</div>
-                      <div className="text-sm text-gray-600">Coming soon - PayPal, Credit Card</div>
+                      <div className="font-semibold text-gray-900">{t['online_payment']}</div>
+                      <div className="text-sm text-gray-600">{t['online_payment_coming_soon']}</div>
                     </div>
                   </button>
                 </div>

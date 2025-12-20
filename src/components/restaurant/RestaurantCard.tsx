@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, Star, Euro } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import type { Restaurant } from '@/lib/api';
 import { useLocaleStore } from '@/lib/store/localeStore';
 

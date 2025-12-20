@@ -166,6 +166,17 @@ const mockMenuData: MenuWithCategories = {
   ],
 };
 
+const getCategoryId = (categoryName: string): string => {
+  const normalized = categoryName
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const slugified = normalized
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slugified || 'category';
+};
+
 export default function RestaurantMenuPage() {
   const params = useParams();
   const slugParam = params.slug;
@@ -173,7 +184,7 @@ export default function RestaurantMenuPage() {
   const { locale, t } = useLocaleStore();
 
   const [menuData, setMenuData] = useState<MenuWithCategories | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -226,18 +237,20 @@ export default function RestaurantMenuPage() {
         }
 
         setMenuData(data);
-        setActiveCategory(data.categories[0]?.name ?? null);
+        const initialCategory = data.categories[0]?.name;
+        setActiveCategoryId(initialCategory ? getCategoryId(initialCategory) : null);
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to load menu:', err);
           // Only use mock data in development
           if (!isMounted) return;
-          setError('Using mock menu until the API is available.');
+          setError(t('menu_using_mock'));
           setMenuData(mockMenuData);
-          setActiveCategory(mockMenuData.categories[0]?.name ?? null);
+          const initialCategory = mockMenuData.categories[0]?.name;
+          setActiveCategoryId(initialCategory ? getCategoryId(initialCategory) : null);
         } else {
           if (!isMounted) return;
-          setError('Unable to load menu. Please try again later.');
+          setError(t('menu_load_error'));
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -249,7 +262,7 @@ export default function RestaurantMenuPage() {
     return () => {
       isMounted = false;
     };
-  }, [slug, locale]);
+  }, [slug, locale, t]);
 
   if (isLoading) {
     return (
@@ -273,7 +286,7 @@ export default function RestaurantMenuPage() {
   if (!menuData || !Array.isArray(menuData.categories)) {
     return (
       <div className="container mx-auto px-4 py-10">
-        <p className="text-lg text-gray-700">Menu not available.</p>
+        <p className="text-lg text-gray-700">{t('menu_not_available')}</p>
       </div>
     );
   }
@@ -390,7 +403,7 @@ export default function RestaurantMenuPage() {
               </div>
               <input
                 type="text"
-                placeholder={t('search_placeholder') || "Ne yemek istersiniz?"}
+                placeholder={t('search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all shadow-sm"
@@ -411,12 +424,12 @@ export default function RestaurantMenuPage() {
             {/* "Tümü" butonu */}
             <button
               onClick={() => {
-                setActiveCategory(null);
+                setActiveCategoryId(null);
                 setSearchQuery('');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-                activeCategory === null && !searchQuery
+                activeCategoryId === null && !searchQuery
                   ? 'bg-[#D32F2F] text-white shadow-md'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
               }`}
@@ -428,11 +441,12 @@ export default function RestaurantMenuPage() {
               <button
                 key={category.name}
                 onClick={() => {
-                  setActiveCategory(category.name);
-                  document.getElementById(category.name)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  const categoryId = getCategoryId(category.name);
+                  setActiveCategoryId(categoryId);
+                  document.getElementById(categoryId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-                  activeCategory === category.name
+                  activeCategoryId === getCategoryId(category.name)
                     ? 'bg-[#D32F2F] text-white shadow-md'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
                 }`}
@@ -468,7 +482,7 @@ export default function RestaurantMenuPage() {
         )}
 
         {(searchQuery ? filteredCategories : categories)?.map((category) => (
-            <div key={category.name} id={category.name} className="mb-8 scroll-mt-48">
+            <div key={category.name} id={getCategoryId(category.name)} className="mb-8 scroll-mt-48">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-2xl">{getCategoryEmoji(category.name)}</span>
                 {category.name}

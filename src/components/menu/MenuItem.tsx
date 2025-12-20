@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Plus, Star } from 'lucide-react';
 import { ItemModal } from './ItemModal';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 interface MenuItemProps {
   item: {
@@ -27,6 +28,7 @@ interface MenuItemProps {
 
 export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, deliveryFee, minimumOrder }: MenuItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useLocaleStore();
 
   // Check availability (support both fields for compatibility)
   const isAvailable = item.is_available ?? item.is_active ?? true;
@@ -60,16 +62,20 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
           {item.is_popular && (
             <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">
               <span className="hidden sm:inline">🔥</span>
-              <span>Popular</span>
+              <span>{t('popular')}</span>
             </div>
           )}
 
           {/* Add Button - Her zaman görünür */}
           <button
-            className="absolute bottom-2 right-2 bg-[#D32F2F] text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 active:scale-95 transition-transform"
-            aria-label={`${item.name} sepete ekle`}
+            className="absolute bottom-2 right-2 bg-[#D32F2F] text-white h-8 w-8 sm:h-9 sm:w-auto sm:px-3 rounded-full flex items-center justify-center gap-1.5 shadow-lg group-hover:scale-110 active:scale-95 transition-transform"
+            aria-label={`${t('customize_order')}: ${item.name}`}
+            title={t('customize_order')}
           >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline text-[11px] font-semibold leading-none">
+              {t('customize_order')}
+            </span>
           </button>
         </div>
 
@@ -81,7 +87,7 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
 
           {/* Açıklama - Sadece tablet ve üstünde */}
           <p className="hidden sm:block text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">
-            {item.description || 'Keine Beschreibung verfügbar'}
+            {item.description || t('no_description')}
           </p>
 
           {/* Alt bilgi - Fiyat ve Rating */}

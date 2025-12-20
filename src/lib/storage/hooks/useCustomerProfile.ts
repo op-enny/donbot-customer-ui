@@ -68,7 +68,7 @@ export function useCustomerProfile() {
   // Get all addresses sorted
   const getAddresses = useCallback(() => {
     return customerProfileStorage.getDeliveryAddresses();
-  }, [profile?.delivery_addresses]);
+  }, []);
 
   // Set preferred payment method
   const setPreferredPayment = useCallback((method: PaymentMethod) => {
@@ -91,12 +91,12 @@ export function useCustomerProfile() {
   // Check if profile exists
   const hasProfile = useCallback(() => {
     return customerProfileStorage.hasProfile();
-  }, [profile]);
+  }, []);
 
   // Get profile age
   const getProfileAge = useCallback(() => {
     return customerProfileStorage.getProfileAgeDays();
-  }, [profile]);
+  }, []);
 
   return {
     profile,

@@ -142,12 +142,16 @@ export function ItemModal({
     const conflict = checkRestaurantConflict(restaurantId);
 
     if (conflict.hasConflict) {
+      const clearCartMessage = t('clear_cart_message')
+        .replace('{restaurant}', conflict.currentRestaurantName || '')
+        .replace('{newRestaurant}', restaurantName);
+
       // Show accessible confirmation dialog instead of browser confirm
       const shouldClear = await confirm({
-        title: 'Clear your cart?',
-        message: `Your cart contains items from ${conflict.currentRestaurantName}. Would you like to clear your cart and add items from ${restaurantName}?`,
-        confirmText: 'Clear & Add',
-        cancelText: 'Keep Cart',
+        title: t('clear_cart_title'),
+        message: clearCartMessage,
+        confirmText: t('clear_cart_confirm'),
+        cancelText: t('clear_cart_keep'),
         variant: 'destructive',
       });
 
@@ -177,7 +181,7 @@ export function ItemModal({
       <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[85vh] overflow-y-auto pb-24 sm:pb-0">
         {/* Modal Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Customize your order</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('customize_order')}</h2>
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"

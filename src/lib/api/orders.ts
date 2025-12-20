@@ -126,10 +126,13 @@ export class OrderValidationError extends Error {
   }
 }
 
+/** Modifier selection options (e.g., { sauce: "Knoblauch", salad: "Alles" }) */
+export type ModifierOptions = Record<string, string | number | boolean | string[]>;
+
 export interface OrderItem {
   menu_item_id: string;
   quantity: number;
-  options?: Record<string, any>;
+  options?: ModifierOptions;
   special_instructions?: string;
 }
 
@@ -149,7 +152,7 @@ export interface OrderItemWithDetails {
   menu_item_name: string;
   quantity: number;
   price_snapshot: number;
-  options?: Record<string, any>;
+  options?: ModifierOptions;
   special_instructions?: string;
 }
 

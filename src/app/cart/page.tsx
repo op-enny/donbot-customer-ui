@@ -21,7 +21,8 @@ export default function CartPage() {
 
   // Wait for client-side hydration to avoid SSR mismatch
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Show loading state during hydration
@@ -30,7 +31,7 @@ export default function CartPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading cart...</p>
+          <p className="text-gray-600">{t['loading_cart']}</p>
         </div>
       </div>
     );
@@ -70,7 +71,7 @@ export default function CartPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{t['your_cart']}</h1>
               <p className="text-sm text-gray-600">
-                from <span className="font-semibold">{restaurantName}</span>
+                {t['from_restaurant']} <span className="font-semibold">{restaurantName}</span>
               </p>
             </div>
 
@@ -136,7 +137,7 @@ export default function CartPage() {
                     {/* Special Instructions */}
                     {item.specialInstructions && (
                       <p className="text-xs text-gray-600 italic">
-                        Note: {item.specialInstructions}
+                        {t['note_label']}: {item.specialInstructions}
                       </p>
                     )}
 
@@ -170,7 +171,7 @@ export default function CartPage() {
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-xs text-gray-500">
-                            €{item.price.toFixed(2)} each
+                            €{item.price.toFixed(2)} {t['each_label']}
                           </p>
                         )}
                       </div>

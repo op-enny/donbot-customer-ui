@@ -1,8 +1,8 @@
 'use client';
 
 import { MapPin, Search, Settings } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocaleStore, translations } from '@/lib/store/localeStore';
+import { useState, useEffect } from 'react';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 interface SearchParams {
   latitude: number;
@@ -79,7 +79,7 @@ async function getCityName(lat: number, lng: number): Promise<string> {
 }
 
 export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initialAddress }: HeroBannerProps) {
-  const { locale, t } = useLocaleStore();
+  const { t } = useLocaleStore();
   
   const [locationName, setLocationName] = useState<string | null>(initialAddress || null);
   const [latitude, setLatitude] = useState<number | null>(initialLatitude || null);
@@ -89,18 +89,11 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Update local state if props change (e.g. initial load)
+  // Fetch city name if coordinates are provided but no address
   useEffect(() => {
-    if (initialLatitude && initialLongitude) {
-      setLatitude(initialLatitude);
-      setLongitude(initialLongitude);
-      
-      if (initialAddress) {
-        setLocationName(initialAddress);
-      } else {
-        // Fetch city name instead of showing coordinates
-        getCityName(initialLatitude, initialLongitude).then(setLocationName);
-      }
+    if (initialLatitude && initialLongitude && !initialAddress) {
+      // Fetch city name instead of showing coordinates
+      getCityName(initialLatitude, initialLongitude).then(setLocationName);
     }
   }, [initialLatitude, initialLongitude, initialAddress]);
 

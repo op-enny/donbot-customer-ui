@@ -3,8 +3,10 @@
 import { Heart, Clock, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 export default function FavoritesPage() {
+  const { t } = useLocaleStore();
   // Mock data - will be replaced with actual favorites from localStorage
   const favorites = [
     {
@@ -24,9 +26,9 @@ export default function FavoritesPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Favorites</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('favorites')}</h1>
           <p className="text-sm text-gray-600 mt-1">
-            {favorites.length} {favorites.length === 1 ? 'restaurant' : 'restaurants'} saved
+            {favorites.length} {favorites.length === 1 ? t('restaurant_singular') : t('restaurant_plural')} {t('saved')}
           </p>
         </div>
       </div>
@@ -36,16 +38,16 @@ export default function FavoritesPage() {
           <div className="text-center py-12">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              No favorites yet
+              {t('no_favorites')}
             </h2>
             <p className="text-gray-600 mb-6">
-              Save your favorite restaurants to order faster
+              {t('save_favorites_hint')}
             </p>
             <Link
               href="/"
               className="inline-block bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
-              Explore Restaurants
+              {t('browse_restaurants')}
             </Link>
           </div>
         ) : (
@@ -98,7 +100,7 @@ export default function FavoritesPage() {
                       {restaurant.deliveryFee === 0 ? (
                         <div className="flex items-center gap-1 text-green-600 font-medium">
                           <MapPin className="w-4 h-4" />
-                          <span>Free delivery</span>
+                          <span>{t('free_delivery')}</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1">

@@ -6,67 +6,7 @@ import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
 import { RestaurantCardSkeleton } from '@/components/ui/skeleton';
 import { restaurantsApi, type Restaurant } from '@/lib/api';
 import { useLocationStore } from '@/lib/store/locationStore';
-import { useLocaleStore, translations } from '@/lib/store/localeStore';
-
-// Mock data for development - will be replaced with real API calls
-const mockRestaurants: Restaurant[] = [
-  {
-    id: '1',
-    name: 'Limon Grillhaus',
-    slug: 'limon-grillhaus',
-    logo_url: null,
-    banner_image_url: null,
-    cuisine_type: 'Turkish Grill',
-    rating: 4.7,
-    delivery_time: '20-30 min',
-    minimum_order: 15,
-    delivery_fee: 2.5,
-    is_open: true,
-    distance: 0.8,
-  },
-  {
-    id: '2',
-    name: 'Pizza Italiana',
-    slug: 'pizza-italiana',
-    logo_url: null,
-    banner_image_url: null,
-    cuisine_type: 'Italian Pizza',
-    rating: 4.5,
-    delivery_time: '25-35 min',
-    minimum_order: 12,
-    delivery_fee: 1.5,
-    is_open: true,
-    distance: 1.2,
-  },
-  {
-    id: '3',
-    name: 'Sushi Garden',
-    slug: 'sushi-garden',
-    logo_url: null,
-    banner_image_url: null,
-    cuisine_type: 'Japanese Sushi',
-    rating: 4.8,
-    delivery_time: '30-40 min',
-    minimum_order: 20,
-    delivery_fee: 3.0,
-    is_open: false,
-    distance: 2.1,
-  },
-  {
-    id: '4',
-    name: 'Burger Palace',
-    slug: 'burger-palace',
-    logo_url: null,
-    banner_image_url: null,
-    cuisine_type: 'American Burgers',
-    rating: 4.3,
-    delivery_time: '15-25 min',
-    minimum_order: 10,
-    delivery_fee: 0,
-    is_open: true,
-    distance: 0.5,
-  },
-];
+import { useLocaleStore } from '@/lib/store/localeStore';
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -86,7 +26,8 @@ export default function Home() {
   });
 
   useEffect(() => {
-    setMounted(true);
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const fetchRestaurants = async (lat: number, lng: number, radius: number, term?: string) => {
@@ -181,7 +122,7 @@ export default function Home() {
               : t('nearby_restaurants')}
           </h2>
           <span className="text-sm text-gray-500">
-            {restaurants.length} {restaurants.length === 1 ? t('places_found').replace('places', 'place') : t('places_found')}
+            {restaurants.length} {restaurants.length === 1 ? t('place_found') : t('places_found')}
           </span>
         </div>
 
@@ -225,7 +166,7 @@ export default function Home() {
                   })}
                   className="mt-6 text-[#D32F2F] font-semibold hover:underline"
                 >
-                  Expand radius to 50km
+                  {t('expand_radius')}
                 </button>
               </div>
             )}
