@@ -204,7 +204,7 @@ export function ItemModal({
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.name}</h3>
               <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-              <p className="text-lg font-bold text-[#D32F2F]">€{item.price.toFixed(2)}</p>
+              <p className="text-lg font-bold text-primary">€{item.price.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@ export function ItemModal({
               <div className="mb-3">
                 <h4 className="text-base font-semibold text-gray-900">
                   {group.name}
-                  {group.required && <span className="text-[#D32F2F] ml-1">*</span>}
+                  {group.required && <span className="text-primary ml-1">*</span>}
                 </h4>
                 <p className="text-sm text-gray-600">
                   {group.selection_type === 'single' ? t('select_one') : t('select_multiple')}
@@ -233,12 +233,12 @@ export function ItemModal({
                       onClick={() => handleOptionSelect(group.id, modifier.id, group.selection_type)}
                       className={`w-full px-4 py-3 rounded-xl border-2 text-left transition-all ${
                         isSelected
-                          ? 'border-[#D32F2F] bg-red-50'
+                          ? 'border-primary bg-primary/10'
                           : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`font-medium ${isSelected ? 'text-[#D32F2F]' : 'text-gray-900'}`}>
+                        <span className={`font-medium ${isSelected ? 'text-primary' : 'text-gray-900'}`}>
                           {modifier.name}
                         </span>
                         {modifier.price_modifier > 0 && (
@@ -267,7 +267,7 @@ export function ItemModal({
                 setSpecialInstructions(sanitizeNotes(e.target.value, 500));
               }}
               placeholder={t('placeholder_notes')}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#D32F2F] focus:outline-none resize-none"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none resize-none"
               rows={3}
               maxLength={500}
               aria-label={t('special_instructions')}
@@ -307,14 +307,14 @@ export function ItemModal({
           <button
             onClick={handleAddToCart}
             disabled={!isValid()}
-            className="w-full bg-[#D32F2F] hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full flex items-center justify-center gap-3 transition-colors shadow-lg"
+            className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-full flex items-center justify-center gap-3 transition-colors shadow-lg"
           >
             <ShoppingCart className="w-5 h-5" />
             <span>{t('add_to_cart')} - €{calculateTotalPrice().toFixed(2)}</span>
           </button>
 
           {!isValid() && (
-            <p className="text-sm text-[#D32F2F] text-center mt-2">
+            <p className="text-sm text-primary text-center mt-2">
               {t('select_required')}
             </p>
           )}

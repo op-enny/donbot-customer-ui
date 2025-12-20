@@ -43,7 +43,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
           )}
 
           {/* Minimum Order Badge (Price Badge) */}
-          <div className="absolute top-3 right-3 bg-[#D32F2F] text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+          <div className="absolute top-3 right-3 bg-primary text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
             €{minimum_order.toFixed(2)}
           </div>
 

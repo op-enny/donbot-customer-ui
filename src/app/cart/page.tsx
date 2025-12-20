@@ -30,7 +30,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">{t['loading_cart']}</p>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function CartPage() {
 
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-[#D32F2F] hover:bg-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-full transition-colors shadow-lg"
           >
             <ArrowLeft className="w-5 h-5" />
             {t['nearby_restaurants']}
@@ -166,7 +166,7 @@ export default function CartPage() {
 
                       {/* Price */}
                       <div className="text-right">
-                        <p className="text-base font-bold text-[#D32F2F]">
+                        <p className="text-base font-bold text-primary">
                           €{(item.price * item.quantity).toFixed(2)}
                         </p>
                         {item.quantity > 1 && (
@@ -181,7 +181,7 @@ export default function CartPage() {
                   {/* Remove Button */}
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="flex-shrink-0 w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors"
+                    className="flex-shrink-0 w-8 h-8 rounded-full hover:bg-primary/10 flex items-center justify-center transition-colors"
                   >
                     <Trash2 className="w-4 h-4 text-red-600" />
                   </button>
@@ -209,7 +209,7 @@ export default function CartPage() {
             <div className="border-t border-gray-200 pt-3">
               <div className="flex justify-between text-lg font-bold text-gray-900">
                 <span>{t['total']}</span>
-                <span className="text-[#D32F2F]">€{grandTotal.toFixed(2)}</span>
+                <span className="text-primary">€{grandTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function CartPage() {
           ) : (
             <Link
               href="/checkout"
-              className="block w-full bg-[#D32F2F] hover:bg-red-700 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
+              className="block w-full bg-primary hover:bg-primary/90 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
             >
               {t['checkout']}
             </Link>

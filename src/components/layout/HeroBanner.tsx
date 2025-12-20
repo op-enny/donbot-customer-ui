@@ -151,17 +151,20 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
   };
 
   return (
-    <div className="bg-[#D32F2F] text-white py-8 md:py-12 px-4 shadow-md relative overflow-hidden">
+    <div className="bg-gradient-to-br from-[#0A1A2F] via-[#0E2238] to-[#142739] text-white py-8 md:py-12 px-4 shadow-md relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FFBE0B]/15 via-transparent to-transparent pointer-events-none" />
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white blur-3xl"></div>
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-yellow-400 blur-3xl"></div>
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-white blur-3xl"></div>
+        <div className="absolute -bottom-36 -left-20 w-[600px] h-[600px] rounded-full bg-[#FFBE0B] blur-3xl"></div>
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[460px] h-[460px] rounded-full bg-[#FF8F00] blur-3xl"></div>
       </div>
 
       <div className="container mx-auto text-center max-w-3xl relative z-10">
         <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight font-display">
           {t('hero_title')}
         </h1>
+        <div className="mx-auto mb-4 h-1 w-24 rounded-full bg-gradient-to-r from-[#FFBE0B] via-[#FF8F00] to-[#D32F2F]" />
         <p className="text-white/90 text-lg mb-8 max-w-xl mx-auto">
           {t('hero_subtitle')}
         </p>
@@ -175,7 +178,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               disabled={isLoadingLocation}
               className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors md:w-auto whitespace-nowrap"
             >
-              <MapPin className={`w-5 h-5 ${isLoadingLocation ? 'animate-pulse text-[#D32F2F]' : 'text-[#D32F2F]'}`} />
+              <MapPin className={`w-5 h-5 ${isLoadingLocation ? 'animate-pulse text-primary' : 'text-primary'}`} />
               <span className="text-sm font-medium truncate max-w-[150px]">
                 {isLoadingLocation ? t('locating') : locationName ? locationName : t('use_my_location')}
               </span>
@@ -205,7 +208,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 py-3 rounded-xl font-bold transition-colors shadow-sm"
+              className="bg-[#FFBE0B] hover:bg-[#E5AB00] text-[#001233] px-8 py-3 rounded-xl font-bold transition-colors shadow-[0_10px_24px_rgba(255,190,11,0.35)]"
             >
               {t('search')}
             </button>
@@ -215,7 +218,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
           <div className={`border-t border-gray-100 mt-2 p-4 ${showFilters ? 'block' : 'hidden md:block'}`}>
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                {t('search_radius')}: <span className="text-[#D32F2F] font-bold">{radius} km</span>
+                {t('search_radius')}: <span className="text-primary font-bold">{radius} km</span>
               </span>
               <input
                 type="range"
@@ -226,7 +229,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
                 onChange={(e) => setRadius(parseInt(e.target.value))}
                 onMouseUp={handleSearch}
                 onTouchEnd={handleSearch}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#D32F2F]"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[hsl(var(--primary))]"
               />
             </div>
           </div>

@@ -220,13 +220,13 @@ export default function OrderTrackingPage() {
 
             <div className="rounded-xl border border-gray-100 p-4 bg-gray-50">
               <p className="text-sm text-gray-600 mb-1">{t('total')}</p>
-              <p className="text-2xl font-bold text-[#D32F2F]">{currencySymbol}{order.total_amount.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-primary">{currencySymbol}{order.total_amount.toFixed(2)}</p>
             </div>
 
             <div className="flex gap-3">
               <Link
                 href="/"
-                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[#D32F2F] text-white font-semibold hover:bg-red-700 transition-colors"
+                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
               >
                 {t('back_to_restaurants')}
               </Link>

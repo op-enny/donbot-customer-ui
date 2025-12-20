@@ -310,7 +310,7 @@ export default function RestaurantMenuPage() {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-r from-[#D32F2F] to-red-600 flex items-center justify-center">
+              <div className="w-full h-full bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center">
                 <span className="text-6xl">🍽️</span>
               </div>
             )}
@@ -359,7 +359,7 @@ export default function RestaurantMenuPage() {
                   {t('open')}
                 </span>
               ) : (
-                <span className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-full">
+                <span className="bg-primary/100 text-white text-sm font-semibold px-4 py-2 rounded-full">
                   {t('closed')}
                 </span>
               )}
@@ -398,7 +398,7 @@ export default function RestaurantMenuPage() {
           <div className="relative flex items-center gap-3">
             {/* Search Input */}
             <div className="flex-1 relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#D32F2F] flex items-center justify-center">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
                 <Search className="w-4 h-4 text-white" />
               </div>
               <input
@@ -406,7 +406,7 @@ export default function RestaurantMenuPage() {
                 placeholder={t('search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all shadow-sm"
+                className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
               />
             </div>
             {/* Filter Button (optional, for future use) */}
@@ -430,7 +430,7 @@ export default function RestaurantMenuPage() {
               }}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                 activeCategoryId === null && !searchQuery
-                  ? 'bg-[#D32F2F] text-white shadow-md'
+                  ? 'bg-primary text-white shadow-md'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
               }`}
             >
@@ -447,7 +447,7 @@ export default function RestaurantMenuPage() {
                 }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   activeCategoryId === getCategoryId(category.name)
-                    ? 'bg-[#D32F2F] text-white shadow-md'
+                    ? 'bg-primary text-white shadow-md'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
                 }`}
               >
@@ -474,7 +474,7 @@ export default function RestaurantMenuPage() {
             </p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-sm text-[#D32F2F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               {t('clear') || 'Temizle'}
             </button>

@@ -94,7 +94,7 @@ export default function Home() {
       <div className="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
         <div className="container mx-auto">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-            <button className="px-6 py-2.5 rounded-full text-sm font-semibold bg-[#D32F2F] text-white shadow-md whitespace-nowrap">
+            <button className="px-6 py-2.5 rounded-full text-sm font-semibold bg-primary text-white shadow-md whitespace-nowrap">
               {t('nearby')}
             </button>
             <button className="px-6 py-2.5 rounded-full text-sm font-medium bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors whitespace-nowrap">
@@ -164,7 +164,7 @@ export default function Home() {
                     longitude,
                     address
                   })}
-                  className="mt-6 text-[#D32F2F] font-semibold hover:underline"
+                  className="mt-6 text-primary font-semibold hover:underline"
                 >
                   {t('expand_radius')}
                 </button>

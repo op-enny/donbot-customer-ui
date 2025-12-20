@@ -16,7 +16,7 @@ export default function OrderNotFound() {
       <div className="flex gap-4">
         <Link
           href="/orders"
-          className="bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg"
+          className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg"
         >
           {t('view_order_history')}
         </Link>

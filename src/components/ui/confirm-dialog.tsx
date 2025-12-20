@@ -130,7 +130,7 @@ export function ConfirmDialogProvider({ children }: ConfirmDialogProviderProps) 
                 onClick={handleConfirm}
                 className={cn(
                   'px-4 py-2',
-                  options.variant !== 'destructive' && 'bg-[#D32F2F] hover:bg-red-700'
+                  options.variant !== 'destructive' && 'bg-primary hover:bg-primary/90'
                 )}
               >
                 {options.confirmText || 'Confirm'}

@@ -15,7 +15,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-full transition-colors shadow-lg"
+        className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3 rounded-full transition-colors shadow-lg"
       >
         {t('back_to_home')}
       </Link>

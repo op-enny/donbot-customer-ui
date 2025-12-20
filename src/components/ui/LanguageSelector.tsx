@@ -109,7 +109,7 @@ export function LanguageSelector() {
               aria-selected={option.code === locale}
               className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                 option.code === locale ? 'bg-gray-50 dark:bg-gray-800 font-medium' : ''
-              } ${focusedIndex === index ? 'ring-2 ring-inset ring-[#D32F2F]' : ''}`}
+              } ${focusedIndex === index ? 'ring-2 ring-inset ring-primary' : ''}`}
             >
               <span className="text-xl" aria-hidden="true">{option.flag}</span>
               <span className="text-sm">{option.label}</span>

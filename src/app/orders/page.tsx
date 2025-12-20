@@ -19,7 +19,7 @@ export default function OrdersPage() {
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-50 pb-24 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function OrdersPage() {
             </p>
             <Link
               href="/"
-              className="inline-block bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-colors"
+              className="inline-block bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
               {t('browse_restaurants')}
             </Link>
@@ -163,7 +163,7 @@ export default function OrdersPage() {
                   order.status
                 ) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <button className="w-full bg-[#D32F2F] hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors text-sm">
+                    <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 rounded-lg transition-colors text-sm">
                       {t('track_order')}
                     </button>
                   </div>
@@ -171,7 +171,7 @@ export default function OrdersPage() {
 
                 {order.status === 'completed' && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <button className="w-full border-2 border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 font-semibold py-2 rounded-lg transition-colors text-sm">
+                    <button className="w-full border-2 border-primary text-primary hover:bg-primary/10 font-semibold py-2 rounded-lg transition-colors text-sm">
                       {t('reorder')}
                     </button>
                   </div>

@@ -102,7 +102,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#D32F2F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">{t['loading_checkout']}</p>
         </div>
       </div>
@@ -315,7 +315,7 @@ export default function CheckoutPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Error Alert */}
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+                <div className="bg-primary/10 border border-red-200 rounded-xl p-4 flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-red-900">{t['order_failed']}</h3>
@@ -327,7 +327,7 @@ export default function CheckoutPage() {
               {/* Customer Information */}
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <User className="w-5 h-5 text-[#D32F2F]" />
+                  <User className="w-5 h-5 text-primary" />
                   {t['contact_info']}
                 </h2>
 
@@ -344,7 +344,7 @@ export default function CheckoutPage() {
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 rounded-xl border-2 ${
                         formErrors.customerName ? 'border-red-500' : 'border-gray-200'
-                      } focus:border-[#D32F2F] focus:outline-none transition-colors`}
+                      } focus:border-primary focus:outline-none transition-colors`}
                       placeholder={t['name']}
                     />
                     {formErrors.customerName && (
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
                           formErrors.customerPhone ? 'border-red-500' : 'border-gray-200'
-                        } focus:border-[#D32F2F] focus:outline-none transition-colors`}
+                        } focus:border-primary focus:outline-none transition-colors`}
                         placeholder="+49 171 1234567"
                       />
                     </div>
@@ -389,7 +389,7 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
                           formErrors.customerEmail ? 'border-red-500' : 'border-gray-200'
-                        } focus:border-[#D32F2F] focus:outline-none transition-colors`}
+                        } focus:border-primary focus:outline-none transition-colors`}
                         placeholder="your.email@example.com"
                       />
                     </div>
@@ -403,7 +403,7 @@ export default function CheckoutPage() {
               {/* Delivery Method */}
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-[#D32F2F]" />
+                  <MapPin className="w-5 h-5 text-primary" />
                   {t['delivery_address']}
                 </h2>
 
@@ -413,7 +413,7 @@ export default function CheckoutPage() {
                     onClick={() => setFormData((prev) => ({ ...prev, deliveryMethod: 'pickup' }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       formData.deliveryMethod === 'pickup'
-                        ? 'border-[#D32F2F] bg-red-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -429,7 +429,7 @@ export default function CheckoutPage() {
                     onClick={() => setFormData((prev) => ({ ...prev, deliveryMethod: 'delivery' }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       formData.deliveryMethod === 'delivery'
-                        ? 'border-[#D32F2F] bg-red-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -454,7 +454,7 @@ export default function CheckoutPage() {
                       rows={3}
                       className={`w-full px-4 py-3 rounded-xl border-2 ${
                         formErrors.deliveryAddress ? 'border-red-500' : 'border-gray-200'
-                      } focus:border-[#D32F2F] focus:outline-none transition-colors resize-none`}
+                      } focus:border-primary focus:outline-none transition-colors resize-none`}
                       placeholder={t['address']}
                     />
                     {formErrors.deliveryAddress && (
@@ -467,7 +467,7 @@ export default function CheckoutPage() {
               {/* Payment Method */}
               <div className="bg-white rounded-2xl shadow-md p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Wallet className="w-5 h-5 text-[#D32F2F]" />
+                  <Wallet className="w-5 h-5 text-primary" />
                   {t['payment_method']}
                 </h2>
 
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
                     onClick={() => setFormData((prev) => ({ ...prev, paymentMethod: 'cash_on_delivery' }))}
                     className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${
                       formData.paymentMethod === 'cash_on_delivery'
-                        ? 'border-[#D32F2F] bg-red-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -493,7 +493,7 @@ export default function CheckoutPage() {
                     onClick={() => setFormData((prev) => ({ ...prev, paymentMethod: 'card_on_delivery' }))}
                     className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${
                       formData.paymentMethod === 'card_on_delivery'
-                        ? 'border-[#D32F2F] bg-red-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -509,7 +509,7 @@ export default function CheckoutPage() {
                     onClick={() => setFormData((prev) => ({ ...prev, paymentMethod: 'online' }))}
                     className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 opacity-50 cursor-not-allowed ${
                       formData.paymentMethod === 'online'
-                        ? 'border-[#D32F2F] bg-red-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200'
                     }`}
                     disabled
@@ -531,7 +531,7 @@ export default function CheckoutPage() {
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#D32F2F] focus:outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors resize-none"
                   placeholder={t['notes']}
                 />
               </div>
@@ -572,7 +572,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-gray-200 pt-2">
                   <div className="flex justify-between text-lg font-bold">
                     <span>{t['total']}</span>
-                    <span className="text-[#D32F2F]">€{grandTotal.toFixed(2)}</span>
+                    <span className="text-primary">€{grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -612,9 +612,9 @@ export default function CheckoutPage() {
                     />
                     <div className={`w-5 h-5 border-2 rounded transition-all flex items-center justify-center ${
                       acceptedTerms
-                        ? 'bg-[#D32F2F] border-[#D32F2F]'
+                        ? 'bg-primary border-primary'
                         : formErrors.terms
-                          ? 'border-red-500 bg-red-50'
+                          ? 'border-red-500 bg-primary/10'
                           : 'border-gray-300 group-hover:border-gray-400'
                     }`}>
                       {acceptedTerms && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
@@ -637,7 +637,7 @@ export default function CheckoutPage() {
                 className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 ${
                   isSubmitting || !acceptedTerms
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-[#D32F2F] hover:bg-red-700 text-white'
+                    : 'bg-primary hover:bg-primary/90 text-white'
                 }`}
               >
                 <CreditCard className="w-5 h-5" />
@@ -652,9 +652,9 @@ export default function CheckoutPage() {
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-3">
-                <Link href="/agb" className="text-[#D32F2F] hover:underline">{t['terms_of_service']}</Link>
+                <Link href="/agb" className="text-primary hover:underline">{t['terms_of_service']}</Link>
                 {' • '}
-                <Link href="/datenschutz" className="text-[#D32F2F] hover:underline">{t['privacy_policy']}</Link>
+                <Link href="/datenschutz" className="text-primary hover:underline">{t['privacy_policy']}</Link>
               </p>
             </div>
           </div>

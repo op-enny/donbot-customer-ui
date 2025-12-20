@@ -27,17 +27,15 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
-          {/* Logo */}
+          {/* Brand */}
           <Link href="/" className="flex-shrink-0">
-            <div className="relative h-12 w-32">
-              <Image
-                src="/donbot-logo.png"
-                alt="DonBot"
-                fill
-                sizes="128px"
-                className="object-contain object-left"
-                priority
-              />
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-extrabold tracking-tight text-foreground font-[var(--font-brand)]">
+                Sipariso
+              </span>
+              <span className="rounded-full bg-[#FFBE0B] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+                Eat
+              </span>
             </div>
           </Link>
 
@@ -54,7 +52,7 @@ export function Header() {
           >
             <ShoppingCart className="w-5 h-5 text-foreground" />
             {mounted && totalItems > 0 && (
-              <div className="absolute -top-1 -right-1 bg-[#D32F2F] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">
                 {totalItems > 9 ? '9+' : totalItems}
               </div>
             )}

@@ -68,11 +68,11 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
 
           {/* Add Button - Her zaman görünür */}
           <button
-            className="absolute bottom-2 right-2 bg-[#D32F2F] text-white h-8 w-8 sm:h-9 sm:w-auto sm:px-3 rounded-full flex items-center justify-center gap-1.5 shadow-lg group-hover:scale-110 active:scale-95 transition-transform"
+            className="absolute bottom-2 right-2 bg-primary text-white h-8 w-8 sm:h-9 sm:w-auto sm:px-3 rounded-full flex items-center justify-center gap-1.5 shadow-lg group-hover:scale-110 active:scale-95 transition-transform"
             aria-label={`${t('customize_order')}: ${item.name}`}
             title={t('customize_order')}
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             <span className="hidden sm:inline text-[11px] font-semibold leading-none">
               {t('customize_order')}
             </span>
@@ -81,7 +81,7 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
 
         {/* Item Info - Mobilde daha kompakt */}
         <div className="p-2.5 sm:p-4">
-          <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1 line-clamp-2 group-hover:text-[#D32F2F] transition-colors leading-tight">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1 line-clamp-2 group-hover:text-primary transition-colors leading-tight">
             {item.name}
           </h3>
 
@@ -105,7 +105,7 @@ export function MenuItem({ item, restaurantId, restaurantName, restaurantSlug, d
             )}
 
             {/* Fiyat */}
-            <span className="text-sm sm:text-lg font-bold text-[#D32F2F]">
+            <span className="text-sm sm:text-lg font-bold text-primary">
               €{item.price.toFixed(2)}
             </span>
           </div>

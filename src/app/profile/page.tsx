@@ -20,7 +20,7 @@ export default function ProfilePage() {
         {/* User Info Card */}
         <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-[#D32F2F] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
               <User className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -28,7 +28,7 @@ export default function ProfilePage() {
               <p className="text-sm text-gray-600">{t('not_logged_in')}</p>
             </div>
           </div>
-          <button className="w-full bg-[#D32F2F] hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors">
+          <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-xl transition-colors">
             {t('sign_in_register')}
           </button>
         </div>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
 
         {/* Logout Button */}
         <div className="mt-6">
-          <button className="w-full flex items-center justify-center gap-2 bg-white border-2 border-red-200 text-red-600 hover:bg-red-50 font-semibold py-3 rounded-xl transition-colors shadow-md">
+          <button className="w-full flex items-center justify-center gap-2 bg-white border-2 border-red-200 text-red-600 hover:bg-primary/10 font-semibold py-3 rounded-xl transition-colors shadow-md">
             <LogOut className="w-5 h-5" />
             {t('sign_out')}
           </button>

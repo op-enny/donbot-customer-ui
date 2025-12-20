@@ -45,7 +45,7 @@ export default function FavoritesPage() {
             </p>
             <Link
               href="/"
-              className="inline-block bg-[#D32F2F] hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition-colors"
+              className="inline-block bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
               {t('browse_restaurants')}
             </Link>
@@ -84,7 +84,7 @@ export default function FavoritesPage() {
                         <p className="text-sm text-gray-600">{restaurant.cuisine}</p>
                       </div>
                       <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <Heart className="w-5 h-5 text-[#D32F2F] fill-[#D32F2F]" />
+                        <Heart className="w-5 h-5 text-primary fill-primary" />
                       </button>
                     </div>
 

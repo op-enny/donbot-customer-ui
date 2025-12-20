@@ -18,6 +18,8 @@ export function BottomNav() {
     return () => clearTimeout(timeoutId);
   }, []);
 
+  if (!mounted) return null;
+
   // Use 0 for SSR, actual count after hydration
   const displayBadge = mounted ? cartItemCount : 0;
 
@@ -51,11 +53,14 @@ export function BottomNav() {
                 <div
                   className={`relative ${
                     isActive
-                      ? 'w-12 h-12 rounded-full flex items-center justify-center bg-[#D32F2F] text-white shadow-lg scale-110 transition-all'
-                      : 'w-12 h-12 rounded-full flex items-center justify-center bg-white border-2 border-gray-300 text-gray-500 hover:text-gray-700 transition-all'
+                      ? 'w-12 h-12 rounded-full flex items-center justify-center bg-primary text-white shadow-lg scale-110 transition-all'
+                      : 'w-12 h-12 rounded-full flex items-center justify-center bg-gray-50 border-2 border-gray-300 text-gray-600 hover:text-gray-800 transition-all'
                   }`}
                 >
-                  <Icon className="w-5 h-5" aria-hidden="true" />
+                  <Icon
+                    className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-600'}`}
+                    aria-hidden="true"
+                  />
                   {badge !== undefined && badge > 0 && (
                     <span
                       className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
@@ -67,7 +72,7 @@ export function BottomNav() {
                 </div>
                 <span
                   className={`text-xs font-medium ${
-                    isActive ? 'text-[#D32F2F]' : 'text-gray-500'
+                    isActive ? 'text-primary' : 'text-gray-500'
                   }`}
                 >
                   {label}
