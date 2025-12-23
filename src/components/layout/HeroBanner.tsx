@@ -1,7 +1,7 @@
 'use client';
 
 import { MapPin, Search, Settings } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocaleStore } from '@/lib/store/localeStore';
 
 interface SearchParams {
@@ -133,6 +133,10 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
   const [showFilters, setShowFilters] = useState(false);
   const [showManualAddress, setShowManualAddress] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const latestSearchTerm = useRef(searchTerm);
+  const latestLocationName = useRef(locationName);
+  const latestLatitude = useRef(latitude);
+  const latestLongitude = useRef(longitude);
 
   // Fetch city name if coordinates are provided but no address
   useEffect(() => {
@@ -141,6 +145,31 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
       getCityName(initialLatitude, initialLongitude).then(setLocationName);
     }
   }, [initialLatitude, initialLongitude, initialAddress]);
+
+  useEffect(() => {
+    latestSearchTerm.current = searchTerm;
+    latestLocationName.current = locationName;
+    latestLatitude.current = latitude;
+    latestLongitude.current = longitude;
+  }, [searchTerm, locationName, latitude, longitude]);
+
+  useEffect(() => {
+    if (latestLatitude.current == null || latestLongitude.current == null) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      onSearch({
+        latitude: latestLatitude.current as number,
+        longitude: latestLongitude.current as number,
+        radius,
+        searchTerm: latestSearchTerm.current || undefined,
+        address: latestLocationName.current || undefined,
+      });
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [radius, onSearch]);
 
   const requestLocation = () => {
     setIsLoadingLocation(true);
@@ -342,13 +371,6 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
                 onChange={(e) => setRadius(parseInt(e.target.value))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[hsl(var(--primary))]"
               />
-              <button
-                type="button"
-                onClick={handleSearch}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg whitespace-nowrap"
-              >
-                {t('apply')}
-              </button>
             </div>
           </div>
         </div>

@@ -140,7 +140,7 @@ export interface SecureUserInfo {
 }
 
 const STORAGE_KEY = 'donbot_user_info_v2';
-const RETENTION_DAYS = 7; // Reduced from 15 days for security
+const RETENTION_DAYS = 30; // Reduced from 15 days for security
 
 export async function saveSecureUserInfo(data: {
   customerName: string;
