@@ -84,7 +84,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
   const [locationName, setLocationName] = useState<string | null>(initialAddress || null);
   const [latitude, setLatitude] = useState<number | null>(initialLatitude || null);
   const [longitude, setLongitude] = useState<number | null>(initialLongitude || null);
-  const [radius, setRadius] = useState(10); // Default 10km
+  const [radius, setRadius] = useState(5); // Default 5km
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -223,7 +223,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               <input
                 type="range"
                 min="1"
-                max="100"
+                max="10"
                 step="1"
                 value={radius}
                 onChange={(e) => setRadius(parseInt(e.target.value))}
