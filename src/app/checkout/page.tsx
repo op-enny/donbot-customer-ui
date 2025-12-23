@@ -97,13 +97,12 @@ export default function CheckoutPage() {
     loadUserData();
   }, [mounted]);
 
-  // Show loading during hydration
+  // Show loading during hydration - use static content to avoid hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t['loading_checkout']}</p>
         </div>
       </div>
     );

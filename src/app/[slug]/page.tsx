@@ -178,6 +178,7 @@ const getCategoryId = (categoryName: string): string => {
 };
 
 export default function RestaurantMenuPage() {
+  const [mounted, setMounted] = useState(false);
   const params = useParams();
   const slugParam = params.slug;
   const slug = Array.isArray(slugParam) ? slugParam[0] : (slugParam as string);
@@ -188,6 +189,11 @@ export default function RestaurantMenuPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   // Kategoriye emoji getiren yardımcı fonksiyon
   const getCategoryEmoji = (categoryName: string): string => {
@@ -264,7 +270,8 @@ export default function RestaurantMenuPage() {
     };
   }, [slug, locale, t]);
 
-  if (isLoading) {
+  // Show loading state during hydration or API fetch to avoid SSR mismatch
+  if (!mounted || isLoading) {
     return (
       <div className="min-h-screen pb-8">
         <div className="bg-white border-b border-gray-200 shadow-sm">

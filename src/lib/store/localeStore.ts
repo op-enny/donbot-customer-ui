@@ -29,11 +29,19 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     // Hero Banner
     'hero_title': 'Hunger? Wir haben da was!',
     'hero_subtitle': 'Finde die besten lokalen Restaurants in deiner Nähe. Lieferung oder Abholung.',
-    'use_my_location': 'Mein Standort',
-    'locating': 'Standort wird ermittelt...',
+    'use_my_location': 'Standort verwenden',
+    'locating': 'Standort wird gesucht...',
+    'location_selected': 'Standort',
     'search_radius': 'Suchradius',
-    'location_error': 'Standort konnte nicht ermittelt werden. Bitte aktivieren Sie die Standortdienste.',
+    'search_cta': 'Suchen',
+    'search_placeholder_hero': 'Restaurant oder Gericht suchen...',
+    'location_error': 'Standort konnte nicht ermittelt werden. Bitte prüfen Sie die Standortberechtigung.',
     'geolocation_unsupported': 'Geolokalisierung wird von Ihrem Browser nicht unterstützt.',
+    'address_not_found': 'Adresse nicht gefunden. Bitte präziser eingeben.',
+    'location_permission_hint': 'Standortzugriff hilft, passende Restaurants schneller zu finden.',
+    'address_hint': 'Zum Beispiel Stadtteil oder Straße angeben.',
+    'manual_address_hint': 'Geben Sie Stadtteil oder Straße ein.',
+    'apply': 'Anwenden',
     
     // Restaurant List
     'nearby_restaurants': 'Restaurants in der Nähe',
@@ -108,6 +116,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'cancel': 'Abbrechen',
     'save': 'Speichern',
     'back': 'Zurück',
+    'hide': 'Ausblenden',
     
     // Errors
     'error_generic': 'Ein Fehler ist aufgetreten',
@@ -235,10 +244,18 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'hero_title': "Hungry? We've got you!",
     'hero_subtitle': 'Find the best local restaurants near you. Order delivery or pickup.',
     'use_my_location': 'Use my location',
-    'locating': 'Locating...',
+    'locating': 'Finding location...',
+    'location_selected': 'Location',
     'search_radius': 'Search Radius',
-    'location_error': 'Unable to get your location. Please enable location services.',
+    'search_cta': 'Search',
+    'search_placeholder_hero': 'Search restaurants or dishes...',
+    'location_error': 'Unable to get your location. Please check your location permission.',
     'geolocation_unsupported': 'Geolocation is not supported by your browser.',
+    'address_not_found': 'Address not found. Please be more specific.',
+    'location_permission_hint': 'Location access helps us find nearby restaurants faster.',
+    'address_hint': 'Try adding a neighborhood or street.',
+    'manual_address_hint': 'Enter a neighborhood or street.',
+    'apply': 'Apply',
     
     // Restaurant List
     'nearby_restaurants': 'Nearby Restaurants',
@@ -313,6 +330,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'cancel': 'Cancel',
     'save': 'Save',
     'back': 'Back',
+    'hide': 'Hide',
     
     // Errors
     'error_generic': 'An error occurred',
@@ -439,11 +457,19 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     // Hero Banner
     'hero_title': 'Acıktınız mı? Biz hallederiz!',
     'hero_subtitle': 'Yakınınızdaki en iyi yerel restoranları bulun. Teslimat veya gel-al siparişi verin.',
-    'use_my_location': 'Konumumu Kullan',
-    'locating': 'Konum bulunuyor...',
+    'use_my_location': 'Konumumu kullan',
+    'locating': 'Konum alınıyor...',
+    'location_selected': 'Konum',
     'search_radius': 'Arama Yarıçapı',
-    'location_error': 'Konumunuz alınamadı. Lütfen konum servislerini etkinleştirin.',
+    'search_cta': 'Ara',
+    'search_placeholder_hero': 'Restoran veya yemek ara...',
+    'location_error': 'Konumunuz alınamadı. Lütfen konum iznini kontrol edin.',
     'geolocation_unsupported': 'Tarayıcınız konum belirlemeyi desteklemiyor.',
+    'address_not_found': 'Adres bulunamadı. Lütfen daha spesifik yazın.',
+    'location_permission_hint': 'Konum izni, yakındaki restoranları daha hızlı bulmamıza yardımcı olur.',
+    'address_hint': 'Mahalle veya cadde eklemeyi deneyin.',
+    'manual_address_hint': 'Mahalle veya cadde yazın.',
+    'apply': 'Uygula',
     
     // Restaurant List
     'nearby_restaurants': 'Yakındaki Restoranlar',
@@ -518,6 +544,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'cancel': 'İptal',
     'save': 'Kaydet',
     'back': 'Geri',
+    'hide': 'Gizle',
     
     // Errors
     'error_generic': 'Bir hata oluştu',

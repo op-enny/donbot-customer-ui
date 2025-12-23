@@ -1,11 +1,26 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { User, MapPin, CreditCard, Bell, Lock, LogOut, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';
 
 export default function ProfilePage() {
+  const [mounted, setMounted] = useState(false);
   const t = useLocaleStore((state) => state.t);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

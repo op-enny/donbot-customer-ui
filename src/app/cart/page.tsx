@@ -25,13 +25,12 @@ export default function CartPage() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Show loading state during hydration
+  // Show loading state during hydration - use static text to avoid hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t['loading_cart']}</p>
         </div>
       </div>
     );

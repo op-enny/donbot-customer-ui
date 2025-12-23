@@ -9,6 +9,7 @@ import { useLocaleStore } from '@/lib/store/localeStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 
 export default function OrderTrackingPage() {
+  const [mounted, setMounted] = useState(false);
   const params = useParams();
   const searchParams = useSearchParams();
   const orderIdParam = params.id;
@@ -25,6 +26,11 @@ export default function OrderTrackingPage() {
   const [token, setToken] = useState<string | null>(null);
   const t = useLocaleStore((state) => state.t);
   const currencySymbol = useLocaleStore((state) => state.currencySymbol);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,6 +101,15 @@ export default function OrderTrackingPage() {
     const statusKey = `payment_status_${status.toLowerCase()}` as const;
     return t(statusKey) || status;
   };
+
+  // Show loading spinner during hydration to avoid SSR mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-12 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">

@@ -21,6 +21,10 @@ interface HeroBannerProps {
 
 // Simple in-memory cache for geocoding results (15 min TTL)
 const geocodeCache = new Map<string, { value: string; timestamp: number }>();
+const forwardGeocodeCache = new Map<
+  string,
+  { value: { latitude: number; longitude: number; displayName: string }; timestamp: number }
+>();
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 // Rate limiter for Nominatim API (max 1 request per second)
@@ -78,6 +82,43 @@ async function getCityName(lat: number, lng: number): Promise<string> {
   }
 }
 
+// Helper function for forward geocoding with caching and rate limiting
+async function getCoordinatesFromAddress(
+  query: string
+): Promise<{ latitude: number; longitude: number; displayName: string } | null> {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return null;
+
+  const cached = forwardGeocodeCache.get(normalizedQuery);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.value;
+  }
+
+  try {
+    const response = await rateLimitedFetch(
+      `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(normalizedQuery)}`
+    );
+    const data = await response.json();
+    const firstResult = Array.isArray(data) ? data[0] : null;
+
+    if (!firstResult) return null;
+
+    const result = {
+      latitude: parseFloat(firstResult.lat),
+      longitude: parseFloat(firstResult.lon),
+      displayName: firstResult.display_name || query,
+    };
+
+    forwardGeocodeCache.set(normalizedQuery, { value: result, timestamp: Date.now() });
+    return result;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching coordinates:', error);
+    }
+    return null;
+  }
+}
+
 export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initialAddress }: HeroBannerProps) {
   const { t } = useLocaleStore();
   
@@ -86,8 +127,12 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
   const [longitude, setLongitude] = useState<number | null>(initialLongitude || null);
   const [radius, setRadius] = useState(5); // Default 5km
   const [searchTerm, setSearchTerm] = useState('');
+  const [manualAddress, setManualAddress] = useState('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showManualAddress, setShowManualAddress] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
 
   // Fetch city name if coordinates are provided but no address
   useEffect(() => {
@@ -135,7 +180,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
     );
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (latitude && longitude) {
       onSearch({
         latitude,
@@ -144,10 +189,35 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
         searchTerm: searchTerm || undefined,
         address: locationName || undefined,
       });
-    } else {
-      // If no location yet, try to get it first
-      requestLocation();
+      return;
     }
+
+    if (manualAddress.trim()) {
+      setAddressError(null);
+      setIsGeocodingAddress(true);
+      const geocoded = await getCoordinatesFromAddress(manualAddress);
+      setIsGeocodingAddress(false);
+
+      if (geocoded) {
+        setLatitude(geocoded.latitude);
+        setLongitude(geocoded.longitude);
+        setLocationName(geocoded.displayName);
+        onSearch({
+          latitude: geocoded.latitude,
+          longitude: geocoded.longitude,
+          radius,
+          searchTerm: searchTerm || undefined,
+          address: geocoded.displayName,
+        });
+        return;
+      }
+
+      setAddressError(t('address_not_found'));
+      return;
+    }
+
+    // If no location yet, try to get it first
+    requestLocation();
   };
 
   return (
@@ -180,7 +250,11 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
             >
               <MapPin className={`w-5 h-5 ${isLoadingLocation ? 'animate-pulse text-primary' : 'text-primary'}`} />
               <span className="text-sm font-medium truncate max-w-[150px]">
-                {isLoadingLocation ? t('locating') : locationName ? locationName : t('use_my_location')}
+                {isLoadingLocation
+                  ? t('locating')
+                  : locationName
+                    ? `${t('location_selected')}: ${locationName}`
+                    : t('use_my_location')}
               </span>
             </button>
 
@@ -189,7 +263,7 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder={t('search_placeholder')}
+                placeholder={t('search_placeholder_hero')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -210,9 +284,48 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
               onClick={handleSearch}
               className="bg-[#FFBE0B] hover:bg-[#E5AB00] text-[#001233] px-8 py-3 rounded-xl font-bold transition-colors shadow-[0_10px_24px_rgba(255,190,11,0.35)]"
             >
-              {t('search')}
+              {t('search_cta')}
             </button>
           </div>
+
+          {!locationName && (
+            <p className="mt-2 text-left text-xs text-gray-500">
+              {t('location_permission_hint')}
+            </p>
+          )}
+
+          {!locationName && (
+            <div className="mt-2 flex flex-col items-start gap-2">
+              <button
+                type="button"
+                onClick={() => setShowManualAddress((prev) => !prev)}
+                className="text-sm font-medium text-gray-600 hover:text-gray-800"
+              >
+                {showManualAddress ? t('hide') : t('address')}
+              </button>
+              {showManualAddress && (
+                <div className="w-full">
+                  <input
+                    type="text"
+                    placeholder={t('address')}
+                    value={manualAddress}
+                    onChange={(e) => setManualAddress(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    disabled={isGeocodingAddress}
+                    className="w-full px-4 py-3 bg-white text-gray-900 placeholder-gray-500 focus:outline-none text-base border border-gray-100 rounded-xl"
+                  />
+                  {addressError && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {addressError} {t('address_hint')}
+                    </p>
+                  )}
+                  {!addressError && (
+                    <p className="mt-1 text-xs text-gray-500">{t('manual_address_hint')}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Expanded Filters (Radius) */}
           <div className={`border-t border-gray-100 mt-2 p-4 ${showFilters ? 'block' : 'hidden md:block'}`}>
@@ -227,10 +340,15 @@ export function HeroBanner({ onSearch, initialLatitude, initialLongitude, initia
                 step="1"
                 value={radius}
                 onChange={(e) => setRadius(parseInt(e.target.value))}
-                onMouseUp={handleSearch}
-                onTouchEnd={handleSearch}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[hsl(var(--primary))]"
               />
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg whitespace-nowrap"
+              >
+                {t('apply')}
+              </button>
             </div>
           </div>
         </div>
