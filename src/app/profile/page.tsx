@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, MapPin, CreditCard, Bell, Lock, LogOut, ChevronRight } from 'lucide-react';
+import { User, MapPin, Bell, Lock, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';
 
@@ -40,12 +40,8 @@ export default function ProfilePage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">{t('guest_user')}</h2>
-              <p className="text-sm text-gray-600">{t('not_logged_in')}</p>
             </div>
           </div>
-          <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-xl transition-colors">
-            {t('sign_in_register')}
-          </button>
         </div>
 
         {/* Menu Items */}
@@ -72,19 +68,6 @@ export default function ProfilePage() {
                 <MapPin className="w-5 h-5 text-green-600" />
               </div>
               <span className="font-medium text-gray-900">{t('saved_addresses')}</span>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-400" />
-          </Link>
-
-          <Link
-            href="/profile/payment"
-            className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-purple-600" />
-              </div>
-              <span className="font-medium text-gray-900">{t('payment_methods')}</span>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -126,13 +109,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Logout Button */}
-        <div className="mt-6">
-          <button className="w-full flex items-center justify-center gap-2 bg-white border-2 border-red-200 text-red-600 hover:bg-primary/10 font-semibold py-3 rounded-xl transition-colors shadow-md">
-            <LogOut className="w-5 h-5" />
-            {t('sign_out')}
-          </button>
-        </div>
       </div>
     </div>
   );

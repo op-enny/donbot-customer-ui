@@ -162,6 +162,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'sign_in_register': 'Anmelden / Registrieren',
     'my_orders': 'Meine Bestellungen',
     'saved_addresses': 'Gespeicherte Adressen',
+    'saved_addresses_hint': 'Hier sehen Sie die zuletzt verwendete Lieferadresse auf diesem Gerät.',
+    'saved_addresses_empty': 'Noch keine Adresse gespeichert.',
+    'saved_address_primary': 'Standardadresse',
     'payment_methods': 'Zahlungsmethoden',
     'settings_privacy': 'Einstellungen & Datenschutz',
     'about': 'Über',
@@ -170,6 +173,19 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Datenschutzerklärung',
     'contact_support': 'Support kontaktieren',
     'sign_out': 'Abmelden',
+    'coming_soon': 'Bald verfügbar',
+    'settings_privacy_title': 'Einstellungen & Datenschutz',
+    'settings_privacy_intro': 'Diese Einstellungen gelten nur auf diesem Gerät.',
+    'privacy_storage_title': 'Lokale Speicherung',
+    'privacy_storage_body': 'Wir speichern Name, Telefon und Adresse lokal, damit die nächste Bestellung schneller ist.',
+    'privacy_retention_title': 'Speicherdauer',
+    'privacy_retention_body': 'Daten werden nach 30 Tagen automatisch gelöscht.',
+    'privacy_delete_title': 'Daten löschen',
+    'privacy_delete_body': 'Sie können gespeicherte Daten jederzeit entfernen.',
+    'privacy_delete_cta': 'Gespeicherte Daten löschen',
+    'privacy_delete_success': 'Gespeicherte Daten wurden gelöscht.',
+    'privacy_contact_title': 'Kontakt',
+    'privacy_contact_body': 'Fragen? Schreiben Sie dem Support.',
 
     // Legal / Checkout
     'order_info_title': 'Bestellhinweis',
@@ -376,6 +392,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'sign_in_register': 'Sign In / Register',
     'my_orders': 'My Orders',
     'saved_addresses': 'Saved Addresses',
+    'saved_addresses_hint': 'See your most recently used delivery address on this device.',
+    'saved_addresses_empty': 'No saved address yet.',
+    'saved_address_primary': 'Primary address',
     'payment_methods': 'Payment Methods',
     'settings_privacy': 'Settings & Privacy',
     'about': 'About',
@@ -384,6 +403,19 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Privacy Policy',
     'contact_support': 'Contact Support',
     'sign_out': 'Sign Out',
+    'coming_soon': 'Coming soon',
+    'settings_privacy_title': 'Settings & Privacy',
+    'settings_privacy_intro': 'These settings apply only on this device.',
+    'privacy_storage_title': 'Local storage',
+    'privacy_storage_body': 'We store name, phone, and address locally to speed up your next order.',
+    'privacy_retention_title': 'Retention',
+    'privacy_retention_body': 'Data is deleted automatically after 30 days.',
+    'privacy_delete_title': 'Delete data',
+    'privacy_delete_body': 'You can remove saved data at any time.',
+    'privacy_delete_cta': 'Delete saved data',
+    'privacy_delete_success': 'Saved data has been deleted.',
+    'privacy_contact_title': 'Contact',
+    'privacy_contact_body': 'Questions? Contact support.',
 
     // Legal / Checkout
     'order_info_title': 'Order Information',
@@ -590,6 +622,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'sign_in_register': 'Giriş Yap / Kayıt Ol',
     'my_orders': 'Siparişlerim',
     'saved_addresses': 'Kayıtlı Adresler',
+    'saved_addresses_hint': 'Bu cihazda en son kullanılan teslimat adresini görürsünüz.',
+    'saved_addresses_empty': 'Henüz kayıtlı adres yok.',
+    'saved_address_primary': 'Varsayılan adres',
     'payment_methods': 'Ödeme Yöntemleri',
     'settings_privacy': 'Ayarlar & Gizlilik',
     'about': 'Hakkında',
@@ -598,6 +633,19 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'privacy_policy': 'Gizlilik Politikası',
     'contact_support': 'Destek İletişim',
     'sign_out': 'Çıkış Yap',
+    'coming_soon': 'Yakında',
+    'settings_privacy_title': 'Ayarlar & Gizlilik',
+    'settings_privacy_intro': 'Bu ayarlar yalnızca bu cihaz için geçerlidir.',
+    'privacy_storage_title': 'Yerel saklama',
+    'privacy_storage_body': 'Sonraki siparişi hızlandırmak için ad, telefon ve adresi cihazda saklarız.',
+    'privacy_retention_title': 'Saklama süresi',
+    'privacy_retention_body': 'Veriler 30 gün sonra otomatik silinir.',
+    'privacy_delete_title': 'Verileri sil',
+    'privacy_delete_body': 'Kaydedilen verileri istediğiniz zaman kaldırabilirsiniz.',
+    'privacy_delete_cta': 'Kaydedilen verileri sil',
+    'privacy_delete_success': 'Kaydedilen veriler silindi.',
+    'privacy_contact_title': 'İletişim',
+    'privacy_contact_body': 'Sorunuz mu var? Destek ekibiyle iletişime geçin.',
 
     // Legal / Checkout
     'order_info_title': 'Sipariş Bilgilendirmesi',
@@ -665,6 +713,9 @@ export const t = (key: string, locale: SupportedLocale): string => {
   return translations[locale]?.[key] || translations['de'][key] || key;
 };
 
+const buildTranslator = (locale: SupportedLocale) => (key: string) =>
+  translations[locale]?.[key] || translations['de'][key] || key;
+
 export const useLocaleStore = create<LocaleState>()(
   persist(
     (set, get) => ({
@@ -674,7 +725,7 @@ export const useLocaleStore = create<LocaleState>()(
       isAutoDetected: false,
 
       setLocale: (locale) => 
-        set({ locale, isAutoDetected: false }),
+        set({ locale, isAutoDetected: false, t: buildTranslator(locale) }),
         
       setFromGeoIP: (data) => 
         set((state) => {
@@ -689,15 +740,13 @@ export const useLocaleStore = create<LocaleState>()(
               currency: data.currency,
               currencySymbol: data.currencySymbol,
               isAutoDetected: true,
+              t: buildTranslator(locale),
             };
           }
           return state;
         }),
 
-      t: (key: string) => {
-        const locale = get().locale;
-        return translations[locale]?.[key] || translations['de'][key] || key;
-      },
+      t: buildTranslator('de'),
     }),
     {
       name: 'donbot_user_locale',
