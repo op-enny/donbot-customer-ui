@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { User, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { useCartStore } from '@/lib/store/cartStore';
+import { useMarketCartStore } from '@/lib/store/marketCartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
-export function Header() {
+export function MarketHeader() {
   const [mounted, setMounted] = useState(false);
-  const totalItems = useCartStore((state) => state.getTotalItems());
+  const totalItems = useMarketCartStore((state) => state.getTotalItems());
   const orders = useOrderHistoryStore((state) => state.orders);
 
   const activeOrdersCount = orders.filter(
@@ -30,10 +30,10 @@ export function Header() {
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-extrabold tracking-tight text-foreground font-[var(--font-brand)]">
-                Sipariso
+                Siparişo
               </span>
-              <span className="rounded-full bg-[#FFBE0B] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
-                Eat
+              <span className="rounded-full bg-[#22C55E] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+                Market
               </span>
             </div>
           </Link>
@@ -47,11 +47,11 @@ export function Header() {
           {/* Cart Icon with Badge */}
           <Link
             href="/cart"
-            className="flex-shrink-0 relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors"
+            className="flex-shrink-0 relative w-10 h-10 rounded-full bg-green-50 flex items-center justify-center hover:bg-green-100 transition-colors"
           >
-            <ShoppingCart className="w-5 h-5 text-foreground" />
+            <ShoppingCart className="w-5 h-5 text-green-700" />
             {mounted && totalItems > 0 && (
-              <div className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute -top-1 -right-1 bg-green-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">
                 {totalItems > 9 ? '9+' : totalItems}
               </div>
             )}

@@ -7,7 +7,7 @@ import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';
 
-export function Header() {
+export function EatHeader() {
   const [mounted, setMounted] = useState(false);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const orders = useOrderHistoryStore((state) => state.orders);
@@ -30,7 +30,7 @@ export function Header() {
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-extrabold tracking-tight text-foreground font-[var(--font-brand)]">
-                Sipariso
+                Siparişo
               </span>
               <span className="rounded-full bg-[#FFBE0B] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
                 Eat

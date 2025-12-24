@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Sora } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { BottomNav } from "@/components/layout/BottomNav";
-import { OrderStatusWatcher } from "@/components/layout/OrderStatusWatcher";
-import { ConfirmDialogProvider } from "@/components/ui/confirm-dialog";
+import { Providers } from "@/components/providers";
+import { VerticalLayout } from "@/components/layout/VerticalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +21,8 @@ const brandFont = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "DonBot - Order from Local Restaurants",
-  description: "Commission-free restaurant ordering platform",
+  title: "Siparişo - Order Food & Groceries",
+  description: "Commission-free ordering platform for restaurants and markets",
 };
 
 export default function RootLayout({
@@ -37,14 +35,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${brandFont.variable} antialiased`}
       >
-        <ConfirmDialogProvider>
-          <OrderStatusWatcher />
-          <Header />
-          <main className="pb-24">
-            {children}
-          </main>
-          <BottomNav />
-        </ConfirmDialogProvider>
+        <Providers>
+          <VerticalLayout>{children}</VerticalLayout>
+        </Providers>
       </body>
     </html>
   );
