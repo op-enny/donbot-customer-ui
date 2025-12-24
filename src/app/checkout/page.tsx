@@ -171,17 +171,16 @@ export default function CheckoutPage() {
     // Remove all non-digit characters except +
     let cleaned = phone.replace(/[^\d+]/g, '');
 
-    // If starts with +49, format as +49 XXX XXXXXXX
-    if (cleaned.startsWith('+49')) {
-      cleaned = cleaned.replace(/^\+49(\d{3})(\d+)/, '+49 $1 $2');
-    } else if (cleaned.startsWith('0049')) {
+    // Convert German local format to international E.164 format (no spaces)
+    if (cleaned.startsWith('0049')) {
       // Convert 0049 to +49
-      cleaned = cleaned.replace(/^0049(\d{3})(\d+)/, '+49 $1 $2');
-    } else if (cleaned.startsWith('0')) {
-      // Convert 0171... to +49 171...
-      cleaned = cleaned.replace(/^0(\d{3})(\d+)/, '+49 $1 $2');
+      cleaned = '+49' + cleaned.slice(4);
+    } else if (cleaned.startsWith('0') && !cleaned.startsWith('+')) {
+      // Convert 0171... to +49171...
+      cleaned = '+49' + cleaned.slice(1);
     }
 
+    // Return without spaces - backend expects E.164 format
     return cleaned;
   };
 
