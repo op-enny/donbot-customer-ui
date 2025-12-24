@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { User, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
 import { LanguageSelector } from '@/components/ui/LanguageSelector';

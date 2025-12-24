@@ -143,17 +143,20 @@ export function DeliverySlotPicker({
         </div>
       )}
 
-      {/* Selected slot summary */}
-      {selectedSlotId && slots && (
-        <div className="mt-4 p-3 bg-green-50 rounded-xl border border-green-200">
-          <p className="text-sm text-green-800">
-            <strong>Selected:</strong>{' '}
-            {format(selectedDate, 'EEEE, d MMMM', { locale: de })} •{' '}
-            {slots.find((s) => s.id === selectedSlotId) &&
-              formatTimeSlot(slots.find((s) => s.id === selectedSlotId)!)}
-          </p>
-        </div>
-      )}
+      {/* Selected slot summary - only show if selected slot exists in current slots */}
+      {selectedSlotId && slots && (() => {
+        const selectedSlot = slots.find((s) => s.id === selectedSlotId);
+        if (!selectedSlot) return null;
+        return (
+          <div className="mt-4 p-3 bg-green-50 rounded-xl border border-green-200">
+            <p className="text-sm text-green-800">
+              <strong>Selected:</strong>{' '}
+              {format(selectedDate, 'EEEE, d MMMM', { locale: de })} •{' '}
+              {formatTimeSlot(selectedSlot)}
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 }

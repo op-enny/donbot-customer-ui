@@ -37,9 +37,6 @@ export function VerticalProvider({
 }
 
 export function useVertical() {
-  const context = useContext(VerticalContext);
-  if (!context) {
-    throw new Error("useVertical must be used within a VerticalProvider");
-  }
-  return context;
+  // Context always has a value due to default, no null check needed
+  return useContext(VerticalContext);
 }

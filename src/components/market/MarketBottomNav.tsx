@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Home, ShoppingCart, Heart, User, Search } from 'lucide-react';
+import { Home, ShoppingCart, User, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';

@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Cart limits for security and performance
+const MAX_CART_ITEMS = 100;
+const MAX_ITEM_QUANTITY = 99;
+
 export type UnitType = 'piece' | 'kg' | 'gram' | 'liter' | 'ml';
 
 export interface MarketCartItem {
@@ -79,23 +83,27 @@ export const useMarketCartStore = create<MarketCartStore>()(
       addItem: (item, marketInfo) => {
         const { marketId, marketName, marketSlug, deliveryFee, minimumOrder } = marketInfo;
         const currentMarketId = get().marketId;
+        const currentItems = get().items;
 
         // If cart has items from a different market, do nothing
         if (currentMarketId && currentMarketId !== marketId) {
           return;
         }
 
+        // Enforce quantity limit
+        const safeQuantity = Math.min(item.quantity, MAX_ITEM_QUANTITY);
+
         // Check if same product already in cart (for piece items, merge quantity)
-        const existingItemIndex = get().items.findIndex(
+        const existingItemIndex = currentItems.findIndex(
           (i) => i.menuItemId === item.menuItemId && item.unit_type === 'piece'
         );
 
         if (existingItemIndex !== -1 && item.unit_type === 'piece') {
-          // Merge quantities for piece items
+          // Merge quantities for piece items (with limit)
           set((state) => ({
             items: state.items.map((i, idx) =>
               idx === existingItemIndex
-                ? { ...i, quantity: i.quantity + item.quantity }
+                ? { ...i, quantity: Math.min(i.quantity + safeQuantity, MAX_ITEM_QUANTITY) }
                 : i
             ),
             marketId,
@@ -104,6 +112,12 @@ export const useMarketCartStore = create<MarketCartStore>()(
             deliveryFee: deliveryFee ?? state.deliveryFee,
             minimumOrder: minimumOrder ?? state.minimumOrder,
           }));
+          return;
+        }
+
+        // Enforce cart item limit
+        if (currentItems.length >= MAX_CART_ITEMS) {
+          console.warn('Cart item limit reached');
           return;
         }
 
@@ -116,6 +130,7 @@ export const useMarketCartStore = create<MarketCartStore>()(
             {
               ...item,
               id: cartItemId,
+              quantity: safeQuantity,
             },
           ],
           marketId,
@@ -161,9 +176,12 @@ export const useMarketCartStore = create<MarketCartStore>()(
           return;
         }
 
+        // Enforce quantity limit
+        const safeQuantity = Math.min(quantity, MAX_ITEM_QUANTITY);
+
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === itemId ? { ...item, quantity } : item
+            item.id === itemId ? { ...item, quantity: safeQuantity } : item
           ),
         }));
       },

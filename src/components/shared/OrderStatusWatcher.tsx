@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { useOrderHistoryStore } from '@/lib/store/orderHistoryStore';
+import { useOrderHistoryStore, type OrderHistoryItem } from '@/lib/store/orderHistoryStore';
 import { ordersApi } from '@/lib/api';
 
 interface OrderStatusWatcherProps {
@@ -31,10 +31,15 @@ export function OrderStatusWatcher({ vertical }: OrderStatusWatcherProps) {
     );
 
     // If vertical is specified, filter orders by vertical type
-    // This assumes orders have a vertical or business_type field
+    // Currently OrderHistoryItem doesn't have vertical field, so show all orders
+    // This filter will be enhanced when order vertical tracking is added
     if (vertical) {
       activeOrders = activeOrders.filter(
-        (order) => (order as any).vertical === vertical || !(order as any).vertical
+        (order) => {
+          // Check if order has vertical property (future-proofing)
+          const orderWithVertical = order as OrderHistoryItem & { vertical?: string };
+          return orderWithVertical.vertical === vertical || !orderWithVertical.vertical;
+        }
       );
     }
 

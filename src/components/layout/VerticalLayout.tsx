@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { VerticalProvider, type Vertical } from '@/contexts/vertical-context';
 import { EatHeader } from '@/components/eat/EatHeader';
 import { EatBottomNav } from '@/components/eat/EatBottomNav';
@@ -33,18 +33,18 @@ function getVerticalFromHost(): Vertical {
   return 'eat'; // Default
 }
 
+// Use useSyncExternalStore for hydration-safe mounted detection
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 interface VerticalLayoutProps {
   children: React.ReactNode;
 }
 
 export function VerticalLayout({ children }: VerticalLayoutProps) {
-  const [mounted, setMounted] = useState(false);
-  const [vertical, setVertical] = useState<Vertical>('eat');
-
-  useEffect(() => {
-    setVertical(getVerticalFromHost());
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const vertical = mounted ? getVerticalFromHost() : 'eat';
 
   // During SSR, render eat layout as default
   if (!mounted) {

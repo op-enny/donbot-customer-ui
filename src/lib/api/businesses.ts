@@ -18,6 +18,13 @@ const validators = {
   isValidRadius: (radiusKm: number): boolean => {
     return typeof radiusKm === 'number' && !isNaN(radiusKm) && radiusKm > 0 && radiusKm <= 100;
   },
+  isValidDate: (dateStr: string): boolean => {
+    if (!dateStr || typeof dateStr !== 'string') return false;
+    // Validate YYYY-MM-DD format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    const date = new Date(dateStr);
+    return !isNaN(date.getTime());
+  },
   sanitizeSearchTerm: (term: string): string => {
     if (!term || typeof term !== 'string') return '';
     return term.trim().slice(0, 100).replace(/[<>'"`;\\]/g, '');
@@ -156,6 +163,10 @@ export const businessesApi = {
       throw new ApiValidationError('Invalid business slug format');
     }
 
+    if (date && !validators.isValidDate(date)) {
+      throw new ApiValidationError('Invalid date format: must be YYYY-MM-DD');
+    }
+
     const params: Record<string, string> = {};
     if (date) params.date = date;
 
@@ -165,7 +176,8 @@ export const businessesApi = {
     );
 
     // Add computed is_available field
-    return response.data.map((slot: any) => ({
+    type ApiDeliverySlot = Omit<DeliverySlot, 'is_available'>;
+    return response.data.map((slot: ApiDeliverySlot) => ({
       ...slot,
       is_available: slot.current_orders < slot.max_orders,
     }));
@@ -216,7 +228,8 @@ export const businessesApi = {
       } catch {
         // Fallback to restaurant endpoint
         const response = await apiClient.get('/public/restaurants/nearby', { params });
-        return response.data.map((r: any) => ({ ...r, business_type: 'restaurant' }));
+        type ApiRestaurant = Omit<Business, 'business_type'>;
+        return response.data.map((r: ApiRestaurant) => ({ ...r, business_type: 'restaurant' as const }));
       }
     } catch (error) {
       if (error instanceof ApiValidationError) {

@@ -48,11 +48,17 @@ export function middleware(request: NextRequest) {
 
   // Set cookie for client-side detection
   const response = NextResponse.next();
-  response.cookies.set("vertical", vertical, {
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    path: "/",
-    sameSite: "lax",
-  });
+
+  // Only set cookie if value changed
+  const existingVertical = request.cookies.get("vertical")?.value;
+  if (existingVertical !== vertical) {
+    response.cookies.set("vertical", vertical, {
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
 
   return response;
 }
