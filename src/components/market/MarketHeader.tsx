@@ -30,7 +30,7 @@ export function MarketHeader() {
           <Link href="/" className="flex-shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-extrabold tracking-tight text-foreground font-[var(--font-brand)]">
-                Siparişo
+                Sipariso
               </span>
               <span className="rounded-full bg-[#22C55E] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
                 Market
