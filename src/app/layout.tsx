@@ -21,7 +21,7 @@ const brandFont = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "Siparişo - Order Food & Groceries",
+  title: "Sipariso - Order Food & Groceries",
   description: "Commission-free ordering platform for restaurants and markets",
 };
 
