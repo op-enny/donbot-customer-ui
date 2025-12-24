@@ -159,6 +159,7 @@ export interface OrderItemWithDetails {
 export interface Order {
   id: string;
   restaurant_id: string;
+  restaurant_name?: string;
   order_number: string;
   customer_name: string;
   customer_phone: string;

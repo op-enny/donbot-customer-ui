@@ -154,7 +154,7 @@ export default function OrderTrackingPage() {
                 <p className="text-sm text-gray-500">{t('order_id')}</p>
                 <h1 className="text-2xl font-bold text-gray-900">{order.order_number || order.id}</h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  {t('restaurant')}: <span className="font-semibold">{order.restaurant_id}</span>
+                  {t('restaurant')}: <span className="font-semibold">{order.restaurant_name || t('unknown')}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full">
@@ -189,7 +189,12 @@ export default function OrderTrackingPage() {
                 </p>
                 {order.estimated_ready_time && (
                   <p className="text-sm text-gray-600">
-                    {t('estimated_ready_time')}: <span className="font-medium">{order.estimated_ready_time}</span>
+                    {t('estimated_ready_time')}: <span className="font-medium">
+                      {new Date(order.estimated_ready_time).toLocaleTimeString('de-DE', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </p>
                 )}
               </div>

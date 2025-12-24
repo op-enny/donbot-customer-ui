@@ -195,13 +195,28 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Prepare order items for API
-      const orderItems = items.map((item) => ({
-        menu_item_id: item.menuItemId,
-        quantity: item.quantity,
-        options: item.options,
-        special_instructions: item.specialInstructions,
-      }));
+      // Prepare order items for API with human-readable modifier names
+      const orderItems = items.map((item) => {
+        // Convert selectedModifiers to human-readable options object
+        // e.g., [{ groupName: "Sauce", options: ["Knoblauch"] }] -> { "Sauce": "Knoblauch" }
+        const humanReadableOptions: Record<string, string | string[]> = {};
+        if (item.selectedModifiers && item.selectedModifiers.length > 0) {
+          for (const modifier of item.selectedModifiers) {
+            if (modifier.options.length === 1) {
+              humanReadableOptions[modifier.groupName] = modifier.options[0];
+            } else if (modifier.options.length > 1) {
+              humanReadableOptions[modifier.groupName] = modifier.options;
+            }
+          }
+        }
+
+        return {
+          menu_item_id: item.menuItemId,
+          quantity: item.quantity,
+          options: Object.keys(humanReadableOptions).length > 0 ? humanReadableOptions : undefined,
+          special_instructions: item.specialInstructions,
+        };
+      });
 
       // Use pre-generated idempotency key (UUID)
       const orderIdempotencyKey = idempotencyKey;
