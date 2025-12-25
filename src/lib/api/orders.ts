@@ -153,9 +153,25 @@ export interface CreateOrderDto {
 export interface OrderItemWithDetails {
   menu_item_name: string;
   quantity: number;
-  price_snapshot: number;
+  price_snapshot: number; // Legacy: same as gross_price_snapshot
+  gross_price_snapshot: number; // Consumer price (VAT included)
+  net_price_snapshot?: number; // Price without VAT
+  vat_rate_snapshot?: number; // VAT rate percentage (e.g., 7.00)
+  vat_amount_snapshot?: number; // VAT amount per unit
   options?: ModifierOptions;
   special_instructions?: string;
+}
+
+export interface OrderVatSummary {
+  total_gross: number;
+  total_net: number;
+  total_vat: number;
+  vat_breakdown: {
+    rate: number;
+    code: string;
+    net_amount: number;
+    vat_amount: number;
+  }[];
 }
 
 export interface Order {
@@ -172,13 +188,16 @@ export interface Order {
   payment_method: string;
   payment_status: string;
   status: string;
-  total_amount: number;
+  total_amount: number; // Total gross amount
+  total_net_amount?: number; // Total without VAT
+  total_vat_amount?: number; // Total VAT
   notes: string | null;
   created_at: string;
   tracking_token?: string;
   tracking_url?: string;
   estimated_ready_time?: string;
   items?: OrderItemWithDetails[];
+  vat_summary?: OrderVatSummary;
 }
 
 /**

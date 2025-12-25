@@ -67,11 +67,22 @@ export interface MarketProductDetails {
   origin_country?: string;
 }
 
+export interface VatRateInfo {
+  id: string;
+  code: string;
+  name: string;
+  rate: number;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number; // Legacy: same as gross_price
+  gross_price: number; // Consumer price (VAT included)
+  net_price: number; // Price without VAT
+  vat_rate_id?: string;
+  vat_rate?: VatRateInfo;
   image_url: string | null;
   category: string;
   is_available: boolean;
