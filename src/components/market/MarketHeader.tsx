@@ -27,7 +27,7 @@ export function MarketHeader() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           {/* Brand */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/market" className="flex-shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-extrabold tracking-tight text-foreground font-[var(--font-brand)]">
                 Sipariso
@@ -46,7 +46,7 @@ export function MarketHeader() {
 
           {/* Cart Icon with Badge */}
           <Link
-            href="/cart"
+            href="/market/cart"
             className="flex-shrink-0 relative w-10 h-10 rounded-full bg-green-50 flex items-center justify-center hover:bg-green-100 transition-colors"
           >
             <ShoppingCart className="w-5 h-5 text-green-700" />
@@ -58,7 +58,7 @@ export function MarketHeader() {
           </Link>
 
           {/* Profile Icon */}
-          <Link href="/profile" className="flex-shrink-0 relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors">
+          <Link href="/shared/profile" className="flex-shrink-0 relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors">
             <User className="w-5 h-5 text-foreground" />
             {mounted && activeOrdersCount > 0 && (
               <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-pulse">

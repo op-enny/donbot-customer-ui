@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Sora } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import { VerticalLayout } from "@/components/layout/VerticalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${brandFont.variable} antialiased`}
       >
-        <Providers>
-          <VerticalLayout>{children}</VerticalLayout>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

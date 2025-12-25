@@ -10,5 +10,6 @@ export {
   type Product,
   type MarketProductDetails,
   type DeliverySlot,
+  type BusinessMenuWithCategories,
 } from './businesses';
 export * from './orders';

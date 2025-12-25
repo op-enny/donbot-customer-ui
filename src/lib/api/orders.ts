@@ -132,6 +132,7 @@ export type ModifierOptions = Record<string, string | number | boolean | string[
 export interface OrderItem {
   menu_item_id: string;
   quantity: number;
+  unit_quantity?: number; // For market items (kg, liter)
   options?: ModifierOptions;
   special_instructions?: string;
 }
@@ -142,6 +143,7 @@ export interface CreateOrderDto {
   customer_email?: string;
   delivery_method: 'pickup' | 'delivery';
   delivery_address?: string;
+  delivery_slot_id?: string; // For market orders with scheduled delivery
   payment_method: 'cash_on_delivery' | 'card_on_delivery' | 'online';
   items: OrderItem[];
   notes?: string;
@@ -166,6 +168,7 @@ export interface Order {
   customer_email: string | null;
   delivery_method: 'pickup' | 'delivery';
   delivery_address: string | null;
+  delivery_slot_id?: string | null; // For market orders with scheduled delivery
   payment_method: string;
   payment_status: string;
   status: string;

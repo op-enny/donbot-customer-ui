@@ -2,16 +2,21 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Middleware to detect and set the vertical (eat/market) based on:
+ * Middleware to detect vertical (eat/market) and rewrite URLs to route groups:
  * 1. Subdomain (production): eat.sipariso.com, market.sipariso.com
  * 2. Query parameter (development): ?vertical=market
  * 3. Cookie (persisted preference)
  *
- * The vertical is set as a cookie so client components can detect it.
+ * Routes are rewritten to:
+ * - /eat/* for restaurant ordering
+ * - /market/* for grocery shopping
+ * - /shared/* for profile, favorites, etc.
  */
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
   const pathname = request.nextUrl.pathname;
+
+  console.log(`[Middleware] pathname: ${pathname}, host: ${host}`);
 
   // Skip for static files, API routes, and Next.js internals
   if (
@@ -19,6 +24,15 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/api") ||
     pathname.includes(".") ||
     pathname.startsWith("/favicon")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Already in correct route - don't rewrite
+  if (
+    pathname.startsWith("/eat") ||
+    pathname.startsWith("/market") ||
+    pathname.startsWith("/shared")
   ) {
     return NextResponse.next();
   }
@@ -31,7 +45,7 @@ export function middleware(request: NextRequest) {
   } else if (host.startsWith("eat.") || host.startsWith("yemek.")) {
     vertical = "eat";
   } else {
-    // Development mode: Check query parameter
+    // Development mode: Check query parameter (highest priority)
     const verticalParam = request.nextUrl.searchParams.get("vertical");
     if (verticalParam === "market") {
       vertical = "market";
@@ -46,19 +60,42 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Set cookie for client-side detection
-  const response = NextResponse.next();
-
-  // Only set cookie if value changed
-  const existingVertical = request.cookies.get("vertical")?.value;
-  if (existingVertical !== vertical) {
+  // Shared routes - rewrite to /shared/...
+  const sharedRoutes = ["/profile", "/favorites"];
+  if (sharedRoutes.some((route) => pathname.startsWith(route))) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/shared${pathname}`;
+    const response = NextResponse.rewrite(url);
+    response.headers.set("x-vertical", vertical);
+    // Set cookie for client-side detection
     response.cookies.set("vertical", vertical, {
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 30,
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
+    return response;
   }
+
+  // Rewrite to vertical route group
+  const url = request.nextUrl.clone();
+  if (pathname === "/") {
+    url.pathname = `/${vertical}`;
+  } else {
+    url.pathname = `/${vertical}${pathname}`;
+  }
+
+  console.log(`[Middleware] Rewriting ${pathname} to ${url.pathname}`);
+
+  const response = NextResponse.rewrite(url);
+
+  // Set cookie for client-side detection
+  response.cookies.set("vertical", vertical, {
+    maxAge: 60 * 60 * 24 * 30,
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
 
   return response;
 }

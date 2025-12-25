@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Home, ShoppingCart, User, Search } from 'lucide-react';
+import { Home, ShoppingCart, User, ClipboardList } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';
@@ -24,10 +24,10 @@ export function MarketBottomNav() {
   const displayBadge = mounted ? cartItemCount : 0;
 
   const navItems = [
-    { icon: Home, label: t('home'), href: '/' },
-    { icon: Search, label: t('search') || 'Search', href: '/search' },
-    { icon: ShoppingCart, label: t('cart'), href: '/cart', badge: displayBadge },
-    { icon: User, label: t('profile'), href: '/profile' },
+    { id: 'home', icon: Home, label: t('home'), href: '/market' },
+    { id: 'orders', icon: ClipboardList, label: t('orders'), href: '/market/orders' },
+    { id: 'cart', icon: ShoppingCart, label: t('cart'), href: '/market/cart', badge: displayBadge },
+    { id: 'profile', icon: User, label: t('profile'), href: '/shared/profile' },
   ];
 
   return (
@@ -38,12 +38,13 @@ export function MarketBottomNav() {
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-around" role="menubar">
-          {navItems.map(({ icon: Icon, label, href, badge }) => {
-            const isActive = pathname === href;
+          {navItems.map(({ id, icon: Icon, label, href, badge }) => {
+            // Check if current path matches or starts with the href (for nested routes)
+            const isActive = pathname === href || (href !== '/market' && pathname.startsWith(href));
 
             return (
               <Link
-                key={href}
+                key={id}
                 href={href}
                 className="flex flex-col items-center gap-1 transition-all"
                 role="menuitem"

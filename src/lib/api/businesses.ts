@@ -16,7 +16,7 @@ const validators = {
     return typeof lng === 'number' && !isNaN(lng) && lng >= -180 && lng <= 180;
   },
   isValidRadius: (radiusKm: number): boolean => {
-    return typeof radiusKm === 'number' && !isNaN(radiusKm) && radiusKm > 0 && radiusKm <= 100;
+    return typeof radiusKm === 'number' && !isNaN(radiusKm) && radiusKm > 0 && radiusKm <= 1000;
   },
   isValidDate: (dateStr: string): boolean => {
     if (!dateStr || typeof dateStr !== 'string') return false;
@@ -31,7 +31,7 @@ const validators = {
   },
 };
 
-export type BusinessType = 'restaurant' | 'market' | 'cafe' | 'bakery';
+export type BusinessType = 'restaurant' | 'grocery' | 'cafe' | 'bakery';
 export type UnitType = 'piece' | 'kg' | 'gram' | 'liter' | 'ml';
 export type StorageType = 'ambient' | 'chilled' | 'frozen';
 
@@ -211,7 +211,7 @@ export const businessesApi = {
       };
 
       if (businessType) {
-        params.business_type = businessType;
+        params.type = businessType;
       }
 
       if (searchTerm) {
@@ -221,15 +221,21 @@ export const businessesApi = {
         }
       }
 
-      // Try new endpoint, fall back to old
+      // Try new endpoint, fall back to old only for restaurants
       try {
         const response = await apiClient.get('/public/businesses/nearby', { params });
         return response.data;
-      } catch {
-        // Fallback to restaurant endpoint
-        const response = await apiClient.get('/public/restaurants/nearby', { params });
-        type ApiRestaurant = Omit<Business, 'business_type'>;
-        return response.data.map((r: ApiRestaurant) => ({ ...r, business_type: 'restaurant' as const }));
+      } catch (err) {
+        // Only fallback to restaurant endpoint if NOT filtering by type
+        // This prevents market queries from incorrectly showing restaurants
+        if (!businessType || businessType === 'restaurant') {
+          const response = await apiClient.get('/public/restaurants/nearby', { params });
+          type ApiRestaurant = Omit<Business, 'business_type'>;
+          return response.data.map((r: ApiRestaurant) => ({ ...r, business_type: 'restaurant' as const }));
+        }
+        // For non-restaurant types, return empty array instead of wrong data
+        console.error('Failed to fetch businesses:', err);
+        return [];
       }
     } catch (error) {
       if (error instanceof ApiValidationError) {

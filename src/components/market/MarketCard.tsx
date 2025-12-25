@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Clock, MapPin, Star, Truck } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useLocaleStore } from '@/lib/store/localeStore';
 import type { Business } from '@/lib/api';
 
 interface MarketCardProps {
@@ -12,10 +13,11 @@ interface MarketCardProps {
 }
 
 export function MarketCard({ market }: MarketCardProps) {
+  const { t } = useLocaleStore();
   const isOpen = true; // TODO: Calculate from business hours
 
   return (
-    <Link href={`/${market.slug}`}>
+    <Link href={`/market/${market.slug}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
         {/* Image Section */}
         <div className="relative h-40 bg-gray-100">
@@ -39,7 +41,7 @@ export function MarketCard({ market }: MarketCardProps) {
               variant={isOpen ? 'default' : 'secondary'}
               className={isOpen ? 'bg-green-600' : 'bg-gray-500'}
             >
-              {isOpen ? 'Open' : 'Closed'}
+              {isOpen ? t('open') : t('closed')}
             </Badge>
           </div>
 
@@ -48,7 +50,7 @@ export function MarketCard({ market }: MarketCardProps) {
             <div className="absolute top-2 right-2">
               <Badge variant="outline" className="bg-white/90">
                 <Clock className="w-3 h-3 mr-1" />
-                Scheduled Delivery
+                {t('delivery')}
               </Badge>
             </div>
           )}
@@ -81,8 +83,8 @@ export function MarketCard({ market }: MarketCardProps) {
                 <Truck className="w-4 h-4" />
                 <span>
                   {market.delivery_fee === 0
-                    ? 'Free delivery'
-                    : `€${market.delivery_fee.toFixed(2)} delivery`}
+                    ? t('free_delivery')
+                    : `€${market.delivery_fee.toFixed(2)} ${t('delivery_fee')}`}
                 </span>
               </div>
             )}
@@ -99,7 +101,7 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Minimum Order */}
           {market.minimum_order && market.minimum_order > 0 && (
             <p className="text-xs text-muted-foreground mt-2">
-              Min. order: €{market.minimum_order.toFixed(2)}
+              {t('min_order')}: €{market.minimum_order.toFixed(2)}
             </p>
           )}
         </CardContent>
