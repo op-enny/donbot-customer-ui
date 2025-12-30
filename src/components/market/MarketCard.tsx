@@ -12,9 +12,46 @@ interface MarketCardProps {
   market: Business;
 }
 
+// Generate consistent color based on market name
+function getMarketColor(name: string): { from: string; to: string; text: string } {
+  const colors = [
+    { from: 'from-emerald-400', to: 'to-teal-500', text: 'text-white' },
+    { from: 'from-cyan-400', to: 'to-blue-500', text: 'text-white' },
+    { from: 'from-violet-400', to: 'to-purple-500', text: 'text-white' },
+    { from: 'from-rose-400', to: 'to-pink-500', text: 'text-white' },
+    { from: 'from-amber-400', to: 'to-orange-500', text: 'text-white' },
+    { from: 'from-lime-400', to: 'to-green-500', text: 'text-white' },
+  ];
+  const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  return colors[index];
+}
+
+// Food pattern SVG as background
+function FoodPatternBackground({ patternId }: { patternId: string }) {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full opacity-[0.12]"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <defs>
+        <pattern id={patternId} x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+          <text x="2" y="14" fontSize="12">🥬</text>
+          <text x="16" y="14" fontSize="12">🍞</text>
+          <text x="2" y="28" fontSize="12">🥩</text>
+          <text x="16" y="28" fontSize="12">🧀</text>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+    </svg>
+  );
+}
+
 export function MarketCard({ market }: MarketCardProps) {
   const { t } = useLocaleStore();
   const isOpen = true; // TODO: Calculate from business hours
+  const initial = market.name.charAt(0).toUpperCase();
+  const colorScheme = getMarketColor(market.name);
 
   return (
     <Link href={`/market/${market.slug}`}>
@@ -30,8 +67,13 @@ export function MarketCard({ market }: MarketCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200">
-              <span className="text-4xl">🛒</span>
+            <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} relative overflow-hidden`}>
+              {/* Food pattern background */}
+              <FoodPatternBackground patternId={`foodPattern-${market.id}`} />
+              {/* Market initial */}
+              <span className={`text-6xl font-bold ${colorScheme.text} drop-shadow-lg relative z-10`}>
+                {initial}
+              </span>
             </div>
           )}
 
@@ -39,7 +81,7 @@ export function MarketCard({ market }: MarketCardProps) {
           <div className="absolute top-2 left-2">
             <Badge
               variant={isOpen ? 'default' : 'secondary'}
-              className={isOpen ? 'bg-green-600' : 'bg-gray-500'}
+              className={isOpen ? 'bg-emerald-500 shadow-md' : 'bg-gray-500'}
             >
               {isOpen ? t('open') : t('closed')}
             </Badge>

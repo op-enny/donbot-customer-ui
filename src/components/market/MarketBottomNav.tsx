@@ -40,7 +40,10 @@ export function MarketBottomNav() {
         <div className="flex items-center justify-around" role="menubar">
           {navItems.map(({ id, icon: Icon, label, href, badge }) => {
             // Check if current path matches or starts with the href (for nested routes)
-            const isActive = pathname === href || (href !== '/market' && pathname.startsWith(href));
+            // Profile için shared/profile ile başlayan path'ler de active sayılır
+            const isActive = pathname === href ||
+              (href === '/shared/profile' && pathname.startsWith('/shared/profile')) ||
+              (href !== '/market' && href !== '/shared/profile' && pathname.startsWith(href));
 
             return (
               <Link

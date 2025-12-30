@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { User, MapPin, Bell, Lock, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useLocaleStore } from '@/lib/store/localeStore';
+import { useVerticalNavigation } from '@/lib/store/verticalStore';
 
 export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
   const t = useLocaleStore((state) => state.t);
+  const { ordersPath } = useVerticalNavigation();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => setMounted(true), 0);
@@ -47,7 +49,7 @@ export default function ProfilePage() {
         {/* Menu Items */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6">
           <Link
-            href="/orders"
+            href={ordersPath}
             className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
           >
             <div className="flex items-center gap-3">
@@ -60,7 +62,7 @@ export default function ProfilePage() {
           </Link>
 
           <Link
-            href="/profile/addresses"
+            href="/shared/profile/addresses"
             className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
           >
             <div className="flex items-center gap-3">
@@ -73,7 +75,7 @@ export default function ProfilePage() {
           </Link>
 
           <Link
-            href="/profile/settings"
+            href="/shared/profile/settings"
             className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
           >
             <div className="flex items-center gap-3">

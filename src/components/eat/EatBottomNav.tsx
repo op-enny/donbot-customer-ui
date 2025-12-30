@@ -24,10 +24,10 @@ export function EatBottomNav() {
   const displayBadge = mounted ? cartItemCount : 0;
 
   const navItems = [
-    { icon: Home, label: t('home'), href: '/' },
-    { icon: ShoppingCart, label: t('cart'), href: '/cart', badge: displayBadge },
-    { icon: Heart, label: t('favorites'), href: '/favorites' },
-    { icon: User, label: t('profile'), href: '/profile' },
+    { icon: Home, label: t('home'), href: '/eat' },
+    { icon: ShoppingCart, label: t('cart'), href: '/eat/cart', badge: displayBadge },
+    { icon: Heart, label: t('favorites'), href: '/eat/favorites' },
+    { icon: User, label: t('profile'), href: '/shared/profile' },
   ];
 
   return (
@@ -39,7 +39,10 @@ export function EatBottomNav() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-around" role="menubar">
           {navItems.map(({ icon: Icon, label, href, badge }) => {
-            const isActive = pathname === href;
+            // Profile için shared/profile ile başlayan path'ler de active sayılır
+            const isActive = pathname === href ||
+              (href === '/shared/profile' && pathname.startsWith('/shared/profile')) ||
+              (href !== '/eat' && href !== '/shared/profile' && pathname.startsWith(href));
 
             return (
               <Link

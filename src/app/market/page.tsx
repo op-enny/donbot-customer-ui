@@ -90,13 +90,41 @@ export default function MarketHomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-green-600 to-green-700 text-white py-12 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
+      {/* Hero Section with Wave Background */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-16 px-4">
+        {/* Animated Wave Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <svg
+            className="absolute bottom-0 left-0 w-full h-32 text-white"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+          >
+            <path
+              fill="currentColor"
+              d="M0,64 C288,120 576,0 864,64 C1152,128 1296,32 1440,64 L1440,120 L0,120 Z"
+            >
+              <animate
+                attributeName="d"
+                dur="10s"
+                repeatCount="indefinite"
+                values="
+                  M0,64 C288,120 576,0 864,64 C1152,128 1296,32 1440,64 L1440,120 L0,120 Z;
+                  M0,80 C288,32 576,96 864,48 C1152,0 1296,80 1440,48 L1440,120 L0,120 Z;
+                  M0,64 C288,120 576,0 864,64 C1152,128 1296,32 1440,64 L1440,120 L0,120 Z
+                "
+              />
+            </path>
+          </svg>
+          {/* Decorative circles */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-teal-200/30 rounded-full blur-3xl" />
+        </div>
+
+        <div className="container mx-auto max-w-4xl relative z-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 text-center text-gray-800">
             {t('market_hero_title')}
           </h1>
-          <p className="text-green-100 text-center mb-8">
+          <p className="text-gray-600 text-center mb-8 max-w-xl mx-auto">
             {t('market_hero_subtitle')}
           </p>
 
@@ -110,12 +138,12 @@ export default function MarketHomePage() {
                   placeholder={t('market_search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300"
+                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 shadow-lg shadow-emerald-100/50 border border-gray-100"
                 />
               </div>
               <button
                 type="submit"
-                className="px-6 py-3.5 bg-green-800 hover:bg-green-900 rounded-xl font-medium transition-colors"
+                className="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-emerald-200/50"
               >
                 {t('market_search_button')}
               </button>
@@ -123,33 +151,33 @@ export default function MarketHomePage() {
           </form>
 
           {/* Location Display */}
-          <div className="flex items-center justify-center gap-2 mt-4 text-green-100 text-sm">
-            <MapPin className="w-4 h-4" />
+          <div className="flex items-center justify-center gap-2 mt-4 text-gray-500 text-sm">
+            <MapPin className="w-4 h-4 text-emerald-500" />
             <span>{address || 'Berlin, Germany'}</span>
           </div>
         </div>
       </div>
 
       {/* Category Tags */}
-      <div className="sticky top-[73px] z-40 bg-white border-b border-gray-200 py-4 px-4 shadow-sm">
+      <div className="sticky top-[73px] z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-4 px-4">
         <div className="container mx-auto">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-            <button className="px-5 py-2.5 rounded-full text-sm font-semibold bg-green-600 text-white shadow-md whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-semibold bg-emerald-500 text-white shadow-md shadow-emerald-200/50 whitespace-nowrap">
               {t('market_all_markets')}
             </button>
-            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors whitespace-nowrap border border-gray-200">
               {t('market_grocery')}
             </button>
-            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors whitespace-nowrap border border-gray-200">
               {t('market_organic')}
             </button>
-            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors whitespace-nowrap border border-gray-200">
               {t('market_fresh_produce')}
             </button>
-            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors whitespace-nowrap border border-gray-200">
               {t('market_bakery')}
             </button>
-            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors whitespace-nowrap border border-gray-200">
               {t('market_butcher')}
             </button>
           </div>

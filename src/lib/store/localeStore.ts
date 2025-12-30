@@ -265,6 +265,14 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'market_no_markets': 'Keine Märkte gefunden',
     'market_no_markets_subtitle': 'Versuchen Sie, den Suchradius zu erweitern oder einen anderen Suchbegriff zu verwenden',
     'market_load_error': 'Märkte konnten nicht geladen werden. Bitte versuchen Sie es erneut.',
+
+    // Product Detail
+    'details': 'Details',
+    'category': 'Kategorie',
+    'unit': 'Einheit',
+    'origin': 'Herkunft',
+    'availability': 'Verfügbarkeit',
+    'view_all_products': 'Alle Produkte anzeigen',
   },
   en: {
     // Header & Navigation
@@ -515,6 +523,14 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'market_no_markets': 'No markets found nearby',
     'market_no_markets_subtitle': 'Try expanding your search radius or search for a different term',
     'market_load_error': 'Failed to load markets. Please try again.',
+
+    // Product Detail
+    'details': 'Details',
+    'category': 'Category',
+    'unit': 'Unit',
+    'origin': 'Origin',
+    'availability': 'Availability',
+    'view_all_products': 'View all products',
   },
   tr: {
     // Header & Navigation
@@ -765,6 +781,14 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'market_no_markets': 'Yakında market bulunamadı',
     'market_no_markets_subtitle': 'Arama yarıçapını genişletmeyi veya farklı bir terim aramayı deneyin',
     'market_load_error': 'Marketler yüklenemedi. Lütfen tekrar deneyin.',
+
+    // Product Detail
+    'details': 'Detaylar',
+    'category': 'Kategori',
+    'unit': 'Birim',
+    'origin': 'Menşe',
+    'availability': 'Stok Durumu',
+    'view_all_products': 'Tüm ürünleri görüntüle',
   },
 };
 

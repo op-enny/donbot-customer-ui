@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Plus, Minus, Snowflake, Thermometer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -80,39 +81,43 @@ export function ProductCard({
     return `€${product.price.toFixed(2)}`;
   };
 
+  const productDetailUrl = `/market/${marketSlug}/product/${product.id}`;
+
   return (
     <Card className={`overflow-hidden h-full ${isOutOfStock ? 'opacity-60' : ''}`}>
-      {/* Image Section */}
-      <div className="relative h-36 bg-gray-100">
-        {product.image_url ? (
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 50vw, 25vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-            <span className="text-3xl">🛍️</span>
-          </div>
-        )}
+      {/* Image Section - Clickable */}
+      <Link href={productDetailUrl} className="block">
+        <div className="relative h-36 bg-gray-100">
+          {product.image_url ? (
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+              <span className="text-3xl">🛍️</span>
+            </div>
+          )}
 
-        {/* Storage type badge */}
-        {getStorageIcon()}
+          {/* Storage type badge */}
+          {getStorageIcon()}
 
-        {/* Stock badge */}
-        {isOutOfStock && (
-          <Badge variant="destructive" className="absolute top-2 right-2">
-            Out of Stock
-          </Badge>
-        )}
-        {isLowStock && (
-          <Badge className="absolute top-2 right-2 bg-orange-500 text-white">
-            Only {marketDetails?.stock_quantity} left
-          </Badge>
-        )}
-      </div>
+          {/* Stock badge */}
+          {isOutOfStock && (
+            <Badge variant="destructive" className="absolute top-2 right-2">
+              Out of Stock
+            </Badge>
+          )}
+          {isLowStock && (
+            <Badge className="absolute top-2 right-2 bg-orange-500 text-white">
+              Only {marketDetails?.stock_quantity} left
+            </Badge>
+          )}
+        </div>
+      </Link>
 
       {/* Content Section */}
       <CardContent className="p-3">
@@ -121,8 +126,12 @@ export function ProductCard({
           <p className="text-xs text-muted-foreground mb-1">{marketDetails.brand}</p>
         )}
 
-        {/* Name */}
-        <h3 className="font-medium text-sm line-clamp-2 mb-1">{product.name}</h3>
+        {/* Name - Clickable */}
+        <Link href={productDetailUrl}>
+          <h3 className="font-medium text-sm line-clamp-2 mb-1 hover:text-green-600 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
 
         {/* Price */}
         <p className="font-bold text-green-700 mb-3">{formatPrice()}</p>

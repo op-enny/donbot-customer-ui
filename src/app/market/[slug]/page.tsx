@@ -71,6 +71,41 @@ const getCategoryId = (categoryName: string): string => {
   return slugified || 'category';
 };
 
+// Generate consistent color based on market name
+function getMarketColor(name: string): { from: string; to: string } {
+  const colors = [
+    { from: 'from-emerald-400', to: 'to-teal-500' },
+    { from: 'from-cyan-400', to: 'to-blue-500' },
+    { from: 'from-violet-400', to: 'to-purple-500' },
+    { from: 'from-rose-400', to: 'to-pink-500' },
+    { from: 'from-amber-400', to: 'to-orange-500' },
+    { from: 'from-lime-400', to: 'to-green-500' },
+  ];
+  const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  return colors[index];
+}
+
+// Food pattern SVG for market header
+function MarketHeaderPattern({ patternId }: { patternId: string }) {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full opacity-[0.10]"
+      viewBox="0 0 200 100"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <defs>
+        <pattern id={patternId} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <text x="4" y="20" fontSize="16">🥬</text>
+          <text x="24" y="20" fontSize="16">🍞</text>
+          <text x="4" y="40" fontSize="16">🥩</text>
+          <text x="24" y="40" fontSize="16">🧀</text>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+    </svg>
+  );
+}
+
 export default function MarketProductsPage() {
   const [mounted, setMounted] = useState(false);
   const params = useParams();
@@ -210,67 +245,90 @@ export default function MarketProductsPage() {
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-6">
           {/* Banner Image */}
-          <div className="relative w-full h-48 rounded-2xl mb-6 overflow-hidden">
+          <div className="relative w-full h-56 rounded-2xl mb-6 overflow-hidden">
             {market.banner_image_url ? (
-              <Image
-                src={market.banner_image_url}
-                alt={`Banner for ${market.name}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                priority
-              />
+              <>
+                <Image
+                  src={market.banner_image_url}
+                  alt={`Banner for ${market.name}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  priority
+                />
+                {/* Gradient overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              </>
             ) : (
-              <div className="w-full h-full bg-gradient-to-r from-green-600 to-green-700 flex items-center justify-center">
-                <span className="text-6xl">🛒</span>
-              </div>
+              (() => {
+                const colorScheme = getMarketColor(market.name);
+                const initial = market.name.charAt(0).toUpperCase();
+                return (
+                  <div className={`w-full h-full bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} flex items-center justify-center relative`}>
+                    {/* Food pattern background */}
+                    <MarketHeaderPattern patternId={`headerPattern-${market.id}`} />
+                    {/* Market initial */}
+                    <span className="text-8xl font-bold text-white drop-shadow-lg relative z-10">
+                      {initial}
+                    </span>
+                    {/* Bottom gradient for text */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  </div>
+                );
+              })()
             )}
-          </div>
 
-          {/* Market Info */}
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{market.name}</h1>
-              {market.description && (
-                <p className="text-gray-600 mb-3">{market.description}</p>
-              )}
-
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                {market.rating && (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{market.rating}</span>
-                  </div>
-                )}
-                {market.delivery_time && (
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{market.delivery_time}</span>
-                  </div>
-                )}
-                {market.address && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{market.address}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Status Badge */}
-            <div className="flex flex-col gap-2">
-              <Badge className="bg-green-600">Open</Badge>
+            {/* Status Badges - Top Right */}
+            <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+              <Badge className="bg-white text-emerald-600 font-semibold shadow-lg px-4 py-1">
+                Open
+              </Badge>
               {market.has_delivery_slots && (
-                <Badge variant="outline" className="text-xs">
+                <Badge className="bg-white/90 text-gray-700 shadow-md px-3 py-1">
                   <Clock className="w-3 h-3 mr-1" />
                   Scheduled
                 </Badge>
               )}
             </div>
+
+            {/* Slogan Overlay - Bottom Left */}
+            {market.description && (
+              <div className="absolute bottom-4 left-4 right-4 z-20">
+                <p className="text-white text-lg font-medium drop-shadow-lg line-clamp-2 max-w-xl">
+                  {market.description}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Market Info */}
+          <div className="mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">{market.name}</h1>
+
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              {market.rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium">{market.rating}</span>
+                </div>
+              )}
+              {market.delivery_time && (
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{market.delivery_time}</span>
+                </div>
+              )}
+              {market.address && (
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  <span>{market.address}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Delivery Info */}
-          <div className="flex items-center gap-6 text-sm bg-green-50 rounded-lg px-4 py-3">
+          <div className="flex items-center gap-6 text-sm bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100">
             <div>
               <span className="text-gray-600">Min. order:</span>
               <span className="font-semibold ml-2">
@@ -301,7 +359,7 @@ export default function MarketProductsPage() {
         <div className="container mx-auto">
           <div className="relative flex items-center gap-3">
             <div className="flex-1 relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-green-600 flex items-center justify-center">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
                 <Search className="w-4 h-4 text-white" />
               </div>
               <input
@@ -309,14 +367,14 @@ export default function MarketProductsPage() {
                 placeholder="Search products, brands..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all shadow-sm"
+                className="w-full pl-14 pr-4 py-3.5 rounded-full bg-gray-50 border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
               />
             </div>
             <button
               onClick={() => setShowInStockOnly(!showInStockOnly)}
               className={`px-4 py-3.5 rounded-full border text-sm font-medium transition-colors ${
                 showInStockOnly
-                  ? 'bg-green-600 text-white border-green-600'
+                  ? 'bg-emerald-500 text-white border-emerald-500 shadow-md'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -330,7 +388,7 @@ export default function MarketProductsPage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="sticky top-[145px] z-30 bg-white border-b border-gray-100 py-3 px-4">
+      <div className="sticky top-[145px] z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 px-4">
         <div className="container mx-auto">
           <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
             <button
@@ -341,8 +399,8 @@ export default function MarketProductsPage() {
               }}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                 activeCategoryId === null && !searchQuery
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                  ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200/50'
+                  : 'bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 border border-gray-200'
               }`}
             >
               <span>🛒</span>
@@ -360,8 +418,8 @@ export default function MarketProductsPage() {
                 }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   activeCategoryId === getCategoryId(category.name)
-                    ? 'bg-green-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200/50'
+                    : 'bg-gray-50 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 border border-gray-200'
                 }`}
               >
                 <span>{getCategoryEmoji(category.name)}</span>
@@ -385,7 +443,7 @@ export default function MarketProductsPage() {
             </p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-sm text-green-600 hover:underline"
+              className="text-sm text-emerald-600 hover:underline"
             >
               Clear
             </button>

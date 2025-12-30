@@ -3,10 +3,15 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useOrderHistoryStore, type OrderHistoryItem } from '@/lib/store/orderHistoryStore';
 import { ordersApi } from '@/lib/api';
+import type { AxiosError } from 'axios';
 
 interface OrderStatusWatcherProps {
   vertical?: 'eat' | 'market';
 }
+
+// Backoff state for rate limiting
+let backoffMs = 0;
+let lastRateLimitTime = 0;
 
 export function OrderStatusWatcher({ vertical }: OrderStatusWatcherProps) {
   const { orders, updateOrderStatus } = useOrderHistoryStore();
@@ -22,6 +27,11 @@ export function OrderStatusWatcher({ vertical }: OrderStatusWatcherProps) {
   }, [orders, updateOrderStatus]);
 
   const checkOrders = useCallback(async () => {
+    // Skip if we're in backoff period
+    if (backoffMs > 0 && Date.now() - lastRateLimitTime < backoffMs) {
+      return;
+    }
+
     const currentOrders = ordersRef.current;
 
     // Filter by vertical if specified
@@ -31,12 +41,9 @@ export function OrderStatusWatcher({ vertical }: OrderStatusWatcherProps) {
     );
 
     // If vertical is specified, filter orders by vertical type
-    // Currently OrderHistoryItem doesn't have vertical field, so show all orders
-    // This filter will be enhanced when order vertical tracking is added
     if (vertical) {
       activeOrders = activeOrders.filter(
         (order) => {
-          // Check if order has vertical property (future-proofing)
           const orderWithVertical = order as OrderHistoryItem & { vertical?: string };
           return orderWithVertical.vertical === vertical || !orderWithVertical.vertical;
         }
@@ -45,39 +52,51 @@ export function OrderStatusWatcher({ vertical }: OrderStatusWatcherProps) {
 
     if (activeOrders.length === 0) return;
 
-    // Fetch all orders in parallel instead of sequentially
-    const results = await Promise.allSettled(
-      activeOrders.map(async (order) => {
+    // Fetch orders sequentially with small delay to avoid rate limiting
+    for (const order of activeOrders) {
+      try {
         const updatedOrder = await ordersApi.trackOrder(order.id, order.trackingToken);
-        return { orderId: order.id, currentStatus: order.status, newStatus: updatedOrder.status };
-      })
-    );
-
-    // Process results
-    results.forEach((result) => {
-      if (result.status === 'fulfilled') {
-        const { orderId, currentStatus, newStatus } = result.value;
-        if (newStatus !== currentStatus) {
-          updateOrderStatusRef.current(orderId, newStatus);
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`Order ${orderId} status updated to ${newStatus}`);
-          }
+        if (updatedOrder.status !== order.status) {
+          updateOrderStatusRef.current(order.id, updatedOrder.status);
         }
-      } else {
-        // Log errors only in development
+        // Reset backoff on success
+        backoffMs = 0;
+      } catch (error) {
+        const axiosError = error as AxiosError;
+
+        // Handle rate limiting (429)
+        if (axiosError.response?.status === 429) {
+          backoffMs = Math.min(backoffMs === 0 ? 60000 : backoffMs * 2, 300000); // 1min, 2min, 4min, max 5min
+          lastRateLimitTime = Date.now();
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Rate limited. Backing off for ${backoffMs / 1000}s`);
+          }
+          return; // Stop checking other orders
+        }
+
+        // Handle 404 (order not found) - silently ignore, order may have been deleted
+        if (axiosError.response?.status === 404) {
+          continue;
+        }
+
+        // Log other errors only in development
         if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to track order:', result.reason);
+          console.error('Failed to track order:', axiosError.message);
         }
       }
-    });
+    }
   }, [vertical]);
 
   useEffect(() => {
-    // Check immediately and then every 30 seconds
-    checkOrders();
-    const interval = setInterval(checkOrders, 30000);
+    // Delay initial check to avoid burst requests on page load
+    const initialDelay = setTimeout(checkOrders, 5000);
+    // Check every 60 seconds (reduced from 30s to avoid rate limiting)
+    const interval = setInterval(checkOrders, 60000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialDelay);
+      clearInterval(interval);
+    };
   }, [checkOrders]);
 
   return null;
