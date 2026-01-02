@@ -30,6 +30,7 @@ import Link from 'next/link';
 export default function MarketCheckoutPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const {
     items,
     marketName,
@@ -65,16 +66,34 @@ export default function MarketCheckoutPage() {
   const deliveryFee = getDeliveryFee();
   const grandTotal = totalPrice + deliveryFee;
 
+  // Wait for Zustand store to hydrate from localStorage
+  useEffect(() => {
+    // Zustand persist middleware fires this after hydration
+    const unsubscribe = useMarketCartStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+
+    // Check if already hydrated
+    if (useMarketCartStore.persist.hasHydrated()) {
+      setHydrated(true);
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // Only redirect after both mounted AND hydrated
   useEffect(() => {
-    if (mounted && items.length === 0) {
-      router.push('/cart');
+    if (mounted && hydrated && items.length === 0) {
+      router.push('/market/cart');
     }
-  }, [mounted, items.length, router]);
+  }, [mounted, hydrated, items.length, router]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -114,7 +133,8 @@ export default function MarketCheckoutPage() {
     loadUserData();
   }, [mounted]);
 
-  if (!mounted) {
+  // Show loading until both mounted and hydrated
+  if (!mounted || !hydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

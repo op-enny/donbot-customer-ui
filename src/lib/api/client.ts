@@ -16,14 +16,9 @@ async function fetchCsrfToken(): Promise<string | null> {
       timeout: 5000, // Short timeout for CSRF token fetch
     });
     return response.data?.token || null;
-  } catch (error) {
-    // Log in all environments for security monitoring
-    // In production, this should be sent to a logging service
-    console.warn('[Security] CSRF token fetch failed:', {
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
-      // Note: Backend may not support CSRF yet - this is expected during development
-    });
+  } catch {
+    // CSRF endpoint not yet implemented in backend - silently ignore
+    // TODO: Re-enable logging when backend CSRF is implemented
     return null;
   }
 }

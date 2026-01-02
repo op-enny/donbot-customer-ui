@@ -249,7 +249,7 @@ export default function MarketCartPage() {
             </button>
           ) : (
             <Link
-              href="/checkout"
+              href="/market/checkout"
               className="block w-full bg-green-600 hover:bg-green-700 text-white font-bold text-center py-4 rounded-full transition-colors shadow-lg"
             >
               Continue to Checkout

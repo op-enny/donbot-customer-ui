@@ -74,41 +74,39 @@ export async function encryptData(plaintext: string): Promise<string> {
 
 /**
  * Decrypt a previously encrypted string
+ * @throws Error if decryption fails (caller should handle)
  */
 export async function decryptData(ciphertext: string): Promise<string> {
   if (typeof window === 'undefined' || !crypto.subtle) {
     return ciphertext;
   }
 
-  try {
-    // Decode base64
-    const combined = new Uint8Array(
-      atob(ciphertext)
-        .split('')
-        .map((c) => c.charCodeAt(0))
-    );
-
-    // Extract salt, iv, and encrypted data
-    const salt = combined.slice(0, 16);
-    const iv = combined.slice(16, 28);
-    const encrypted = combined.slice(28);
-
-    const key = await deriveKey(salt);
-
-    const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
-      key,
-      encrypted
-    );
-
-    return new TextDecoder().decode(decrypted);
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Decryption failed:', error);
-    }
-    // Return original if decryption fails (may be unencrypted legacy data)
+  // Check if data looks like it might be unencrypted (legacy or plain text)
+  if (!isEncrypted(ciphertext)) {
     return ciphertext;
   }
+
+  // Decode base64
+  const combined = new Uint8Array(
+    atob(ciphertext)
+      .split('')
+      .map((c) => c.charCodeAt(0))
+  );
+
+  // Extract salt, iv, and encrypted data
+  const salt = combined.slice(0, 16);
+  const iv = combined.slice(16, 28);
+  const encrypted = combined.slice(28);
+
+  const key = await deriveKey(salt);
+
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encrypted
+  );
+
+  return new TextDecoder().decode(decrypted);
 }
 
 /**
@@ -191,12 +189,22 @@ export async function loadSecureUserInfo(): Promise<{
 
       // Decrypt if encrypted
       if (data.encrypted) {
-        return {
-          customerName: data.customerName,
-          customerPhone: await decryptData(data.customerPhone),
-          customerEmail: data.customerEmail ? await decryptData(data.customerEmail) : undefined,
-          deliveryAddress: data.deliveryAddress ? await decryptData(data.deliveryAddress) : undefined,
-        };
+        try {
+          return {
+            customerName: data.customerName,
+            customerPhone: await decryptData(data.customerPhone),
+            customerEmail: data.customerEmail ? await decryptData(data.customerEmail) : undefined,
+            deliveryAddress: data.deliveryAddress ? await decryptData(data.deliveryAddress) : undefined,
+          };
+        } catch (decryptError) {
+          // Decryption failed - likely browser/key changed
+          // Clear corrupted data and return null gracefully
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Decryption failed, clearing stored user info:', decryptError);
+          }
+          localStorage.removeItem(STORAGE_KEY);
+          return null;
+        }
       }
 
       return {
